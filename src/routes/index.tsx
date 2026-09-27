@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowRight, Clapperboard, Film, Play, Sparkles, Tv } from "lucide-react";
-import { CATEGORIES, fetchFeatured, fetchRow, type Item, type Kind } from "@/lib/catalog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { ArrowDown, ArrowRight, Clapperboard, Eye, Film, MessagesSquare, Play, Sparkles, Tv } from "lucide-react";
+import { fetchFeatured } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
-import { PosterCard, PosterSkeleton } from "@/components/mv/PosterCard";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchVisits } from "@/lib/community";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -132,15 +134,44 @@ function About() {
   );
 }
 
+function CommunityAndVisits() {
+  const qc = useQueryClient();
+  const { data: visits } = useQuery({ queryKey: ["visits"], queryFn: fetchVisits, networkMode: "online", refetchInterval: 60_000 });
+  useEffect(() => {
+    const ch = supabase
+      .channel("site-stats")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "site_stats" }, (p) => {
+        const v = (p.new as { visits?: number }).visits;
+        if (v != null) qc.setQueryData(["visits"], Number(v));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [qc]);
+  return (
+    <section className="mx-auto max-w-[1500px] px-4 pt-16 md:px-8">
+      <div className="flex flex-col items-center gap-6 rounded-2xl border border-border bg-card p-10 text-center">
+        <MessagesSquare className="h-10 w-10 text-primary" />
+        <h2 className="text-3xl font-bold">Rejoignez la communauté</h2>
+        <p className="max-w-xl text-muted-foreground">Lisez les avis, likez les publications et discutez de vos titres préférés.</p>
+        <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+          <Link to="/communaute">Avis & discussions <ArrowRight /></Link>
+        </Button>
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Eye className="h-4 w-4" />
+          <span className="text-lg font-bold tabular-nums text-foreground">{visits != null ? visits.toLocaleString("fr-FR") : "…"}</span> visites au total
+          <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Home() {
-  const { settings } = useStore();
   return (
     <div className="pb-10">
       <Hero />
       <About />
-      <div className="border-t border-border pt-10">
-        {(Object.keys(CATEGORIES) as Kind[]).filter((k) => settings.categories[k]).map((k) => <KindRow key={k} kind={k} />)}
-      </div>
+      <CommunityAndVisits />
     </div>
   );
 }
