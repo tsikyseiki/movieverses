@@ -105,7 +105,7 @@ function Comments({ postId }: { postId: string }) {
   }, [postId, qc]);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!author.trim() || !body.trim()) return toast.error("Pseudo et commentaire requis");
+    if (!author.trim() || !body.trim()) { toast.error("Pseudo et commentaire requis"); return; }
     setBusy(true);
     try {
       await addComment(postId, author.trim().slice(0, 40), body.trim().slice(0, 1000));

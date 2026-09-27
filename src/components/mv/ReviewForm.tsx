@@ -14,7 +14,7 @@ export function ReviewForm({ item, myRating }: { item: Target; myRating: number 
   const [done, setDone] = useState(false);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!author.trim() || !body.trim()) return toast.error("Pseudo et avis requis");
+    if (!author.trim() || !body.trim()) { toast.error("Pseudo et avis requis"); return; }
     setBusy(true);
     try {
       await createPost({ ...item, user_rating: myRating || null, author: author.trim().slice(0, 40), body: body.trim().slice(0, 2000) });
