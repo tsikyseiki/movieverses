@@ -14,13 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      post_comments: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          device_id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author: string
+          body: string
+          comments_count: number
+          created_at: string
+          id: string
+          item_id: string
+          kind: string
+          likes_count: number
+          poster: string | null
+          rating: number | null
+          title: string
+          user_rating: number | null
+        }
+        Insert: {
+          author: string
+          body: string
+          comments_count?: number
+          created_at?: string
+          id?: string
+          item_id: string
+          kind: string
+          likes_count?: number
+          poster?: string | null
+          rating?: number | null
+          title: string
+          user_rating?: number | null
+        }
+        Update: {
+          author?: string
+          body?: string
+          comments_count?: number
+          created_at?: string
+          id?: string
+          item_id?: string
+          kind?: string
+          likes_count?: number
+          poster?: string | null
+          rating?: number | null
+          title?: string
+          user_rating?: number | null
+        }
+        Relationships: []
+      }
+      site_stats: {
+        Row: {
+          id: number
+          visits: number
+        }
+        Insert: {
+          id?: number
+          visits?: number
+        }
+        Update: {
+          id?: number
+          visits?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      register_visit: { Args: never; Returns: number }
+      toggle_like: { Args: { _device: string; _post: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
