@@ -63,29 +63,6 @@ function Hero() {
   );
 }
 
-function Row({ title, items, loading, to }: { title: string; items?: Item[] | undefined; loading?: boolean; to?: string }) {
-  if (!loading && !items?.length) return null;
-  return (
-    <section className="mx-auto max-w-[1500px] px-4 py-6 md:px-8">
-      <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
-        {to && <Link to={to as "/films"} className="group inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">Tout voir <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></Link>}
-      </div>
-      <div className="no-scrollbar -mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2">
-        {loading && !items
-          ? Array.from({ length: 8 }).map((_, i) => <div key={i} className="w-36 shrink-0 md:w-44"><PosterSkeleton /></div>)
-          : items!.map((i, n) => <div key={`${i.kind}${i.id}`} className="w-36 shrink-0 snap-start md:w-44"><PosterCard item={i} index={n} /></div>)}
-      </div>
-    </section>
-  );
-}
-
-function KindRow({ kind }: { kind: Kind }) {
-  const { settings } = useStore();
-  const { data, isLoading } = useQuery({ queryKey: ["row", kind, settings.lang], queryFn: () => fetchRow(kind, settings.lang), staleTime: 10 * 60_000, retry: 1 });
-  return <Row title={`Tendances · ${CATEGORIES[kind].label}`} items={data} loading={isLoading} to={CATEGORIES[kind].path} />;
-}
-
 const universes = [
   { kind: "film" as const, title: "Films", copy: "Du grand spectacle aux histoires intimes, explorez le cinéma par genre.", to: "/films" as const, icon: Film },
   { kind: "manga" as const, title: "Animé Manga", copy: "Shonen, seinen, isekai et bien plus, directement depuis le Japon.", to: "/manga" as const, icon: Clapperboard },

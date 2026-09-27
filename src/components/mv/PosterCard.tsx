@@ -22,8 +22,8 @@ export function PosterCard({ item, index = 0 }: { item: Item; index?: number }) 
           )}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/95 to-transparent opacity-80" />
           {item.rating != null && (
-            <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-scrim/80 px-2 py-0.5 text-xs font-semibold text-foreground backdrop-blur">
-              <Star className="h-3 w-3 fill-gold text-gold" /> {item.rating.toFixed(1)}
+            <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-sm font-extrabold text-scrim shadow-lg ring-1 ring-scrim/30">
+              <Star className="h-3.5 w-3.5 fill-current" /> {item.rating.toFixed(1)}
             </span>
           )}
         </div>
