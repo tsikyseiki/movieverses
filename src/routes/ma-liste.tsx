@@ -11,6 +11,8 @@ export const Route = createFileRoute("/ma-liste")({
       { name: "description", content: "Vos favoris et votre historique, enregistrés sur cet appareil." },
       { property: "og:title", content: "Ma liste — MovieVerse" },
       { property: "og:description", content: "Favoris et historique de visionnage." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MyList,

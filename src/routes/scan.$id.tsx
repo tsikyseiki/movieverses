@@ -14,6 +14,8 @@ export const Route = createFileRoute("/scan/$id")({
       { name: "description", content: "Lisez les chapitres disponibles du manga via MangaDex." },
       { property: "og:title", content: "Lecture du scan — MovieVerse" },
       { property: "og:description", content: "Chapitres du manga disponibles en lecture." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ScanPage,

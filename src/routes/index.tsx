@@ -1,11 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Compass, Heart, Star } from "lucide-react";
-import { CATEGORIES, fetchFeatured, fetchRow, shuffle, type Item, type Kind } from "@/lib/catalog";
+import { ArrowDown, ArrowRight, Clapperboard, Film, Play, Sparkles, Tv } from "lucide-react";
+import { fetchFeatured, fetchRow, type Item, type Kind } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { PosterCard, PosterSkeleton } from "@/components/mv/PosterCard";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,67 +13,50 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Explorez les tendances du moment : films, animés japonais et séries animées occidentales, en temps réel." },
       { property: "og:title", content: "MovieVerse — Le catalogue ciné & animé" },
       { property: "og:description", content: "Tendances, nouveautés et fiches détaillées de films et d'animés." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
 });
 
 function Hero() {
-  const { settings, favorites, isFavorite, toggleFavorite } = useStore();
+  const { settings } = useStore();
   const { data } = useQuery({ queryKey: ["featured", settings.lang], queryFn: () => fetchFeatured(settings.lang), staleTime: 15 * 60_000 });
-  const [seed, setSeed] = useState(0);
-  useEffect(() => setSeed(Math.random() + 1), []); // new rotation on every visit (client only)
-  const slides = useMemo(() => {
-    if (!data || !seed) return [];
-    const favGenres = new Set(favorites.flatMap((f) => f.genreIds ?? []));
-    const allowed = data.filter((d) => settings.categories[d.kind]);
-    const boosted = allowed.filter((d) => d.genreIds?.some((g) => favGenres.has(g)));
-    return shuffle([...shuffle(boosted).slice(0, 2), ...shuffle(allowed)]).filter((v, i, a) => a.findIndex((x) => x.id === v.id && x.kind === v.kind) === i).slice(0, 7);
-  }, [data, seed, settings.categories]);
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    if (!settings.autoplayHero || slides.length < 2) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 7000);
-    return () => clearInterval(t);
-  }, [slides.length, settings.autoplayHero, idx]);
-  const cur = slides[idx];
-  if (!cur) return <div className="h-[82vh] min-h-[560px] animate-pulse bg-muted" />;
-  const fav = isFavorite(cur);
+  const featured = data?.find((item) => item.backdrop);
   return (
-    <section className="relative h-[82vh] min-h-[560px] overflow-hidden">
-      {slides.map((s, i) => (
-        <div key={`${s.kind}${s.id}`} className={cn("absolute inset-0 transition-opacity duration-1000", i === idx ? "opacity-100" : "opacity-0")}>
-          <img src={s.backdrop!} alt="" className={cn("h-full w-full object-cover", i === idx && "animate-kenburns")} />
-        </div>
-      ))}
-      <div className="absolute inset-0 bg-gradient-to-r from-scrim via-scrim/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-scrim/40" />
-      <div key={idx} className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-4 pb-20 md:px-8">
-        <span className="animate-rise inline-flex w-fit items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
-          À la une · {CATEGORIES[cur.kind].label}
-        </span>
-        <h1 className="animate-rise mt-4 max-w-3xl text-4xl font-extrabold leading-[0.95] md:text-7xl" style={{ animationDelay: "80ms" }}>{cur.title}</h1>
-        <div className="animate-rise mt-4 flex items-center gap-4 text-sm text-muted-foreground" style={{ animationDelay: "140ms" }}>
-          {cur.rating != null && <span className="flex items-center gap-1 font-semibold text-foreground"><Star className="h-4 w-4 fill-gold text-gold" />{cur.rating.toFixed(1)}</span>}
-          <span>{cur.date?.slice(0, 4)}</span>
-        </div>
-        <p className="animate-rise mt-4 line-clamp-3 max-w-xl text-base text-foreground/80" style={{ animationDelay: "200ms" }}>{cur.overview}</p>
-        <div className="animate-rise mt-7 flex flex-wrap gap-3" style={{ animationDelay: "260ms" }}>
-          <Link to="/titre/$kind/$id" params={{ kind: cur.kind, id: cur.id }} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-[1.03]">
-            <Compass className="h-5 w-5" /> Explorer
-          </Link>
-          <button onClick={() => toggleFavorite(cur)} className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-6 py-3 font-semibold backdrop-blur transition hover:bg-background/70">
-            <Heart className={cn("h-5 w-5", fav && "fill-primary text-primary")} /> {fav ? "Dans ma liste" : "Ma liste"}
-          </button>
-        </div>
-        <div className="mt-10 flex items-center gap-3">
-          <button aria-label="Précédent" onClick={() => setIdx((idx - 1 + slides.length) % slides.length)} className="rounded-full border border-border p-2 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button>
-          {slides.map((_, i) => (
-            <button key={i} aria-label={`Diapo ${i + 1}`} onClick={() => setIdx(i)} className={cn("h-1 rounded-full transition-all", i === idx ? "w-10 bg-primary" : "w-4 bg-foreground/30")} />
-          ))}
-          <button aria-label="Suivant" onClick={() => setIdx((idx + 1) % slides.length)} className="rounded-full border border-border p-2 hover:bg-accent"><ChevronRight className="h-4 w-4" /></button>
+    <section className="relative flex h-[86vh] min-h-[620px] items-end overflow-hidden">
+      {featured?.backdrop ? (
+        <img src={featured.backdrop} alt="" className="absolute inset-0 h-full w-full animate-kenburns object-cover" />
+      ) : (
+        <div className="absolute inset-0 animate-pulse bg-muted" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-r from-scrim via-scrim/75 to-scrim/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-scrim/50" />
+      <div className="relative mx-auto w-full max-w-[1500px] px-4 pb-16 md:px-8 md:pb-20">
+        <div className="max-w-4xl">
+          <span className="animate-rise inline-flex items-center gap-2 text-sm font-semibold uppercase text-primary">
+            <Sparkles className="h-4 w-4" /> Votre univers cinéma & animation
+          </span>
+          <h1 className="animate-rise mt-5 text-5xl font-extrabold leading-none sm:text-7xl lg:text-8xl">
+            Movie<span className="text-primary">Verse</span>
+          </h1>
+          <p className="animate-rise mt-6 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
+            Découvrez films, animés manga et créations occidentales dans un catalogue vivant, enrichi en temps réel.
+          </p>
+          <div className="animate-rise mt-8 flex flex-wrap items-center gap-4">
+            <Button asChild size="lg" className="h-12 rounded-full px-7 text-base shadow-lg shadow-primary/30">
+              <a href="#catalogues"><Play className="fill-current" /> Explorer les catalogues</a>
+            </Button>
+            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-primary" /> Données actualisées en direct
+            </span>
+          </div>
         </div>
       </div>
+      <a href="#a-propos" aria-label="Découvrir MovieVerse" className="absolute bottom-5 left-1/2 -translate-x-1/2 text-foreground/60 transition hover:text-foreground">
+        <ArrowDown className="h-6 w-6 animate-bounce" />
+      </a>
     </section>
   );
 }
@@ -102,15 +84,62 @@ function KindRow({ kind }: { kind: Kind }) {
   return <Row title={`Tendances · ${CATEGORIES[kind].label}`} items={data} loading={isLoading} to={CATEGORIES[kind].path} />;
 }
 
+const universes = [
+  { kind: "film" as const, title: "Films", copy: "Du grand spectacle aux histoires intimes, explorez le cinéma par genre.", to: "/films" as const, icon: Film },
+  { kind: "manga" as const, title: "Animé Manga", copy: "Shonen, seinen, isekai et bien plus, directement depuis le Japon.", to: "/manga" as const, icon: Clapperboard },
+  { kind: "occidental" as const, title: "Animé Occidental", copy: "Cartoons, super-héros et séries animées pour tous les univers.", to: "/occidental" as const, icon: Tv },
+];
+
+function About() {
+  return (
+    <>
+      <section id="a-propos" className="border-b border-border">
+        <div className="mx-auto grid max-w-[1500px] gap-8 px-4 py-20 md:grid-cols-[0.8fr_1.2fr] md:px-8 md:py-28">
+          <p className="text-sm font-semibold uppercase text-primary">À propos de MovieVerse</p>
+          <div>
+            <h2 className="max-w-4xl text-3xl font-bold leading-tight md:text-5xl">Une seule destination pour trouver votre prochaine histoire.</h2>
+            <p className="mt-6 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+              MovieVerse rassemble les tendances, nouveautés, bandes-annonces, distributions et recommandations. Parcourez librement, gardez vos coups de cœur et reprenez vos découvertes quand vous le souhaitez.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section id="catalogues" className="mx-auto max-w-[1500px] px-4 py-20 md:px-8 md:py-28">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase text-primary">Trois univers</p>
+            <h2 className="mt-3 text-3xl font-bold md:text-5xl">Choisissez votre catalogue</h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-muted-foreground">Chaque univers possède ses propres genres, tendances et recommandations.</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {universes.map(({ title, copy, to, icon: Icon }) => (
+            <Link key={to} to={to} className="group relative min-h-72 overflow-hidden rounded-lg border border-border bg-card p-7 transition duration-500 hover:-translate-y-1 hover:border-primary/60">
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-primary/15 to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
+              <div className="relative flex h-full flex-col">
+                <Icon className="h-9 w-9 text-primary" />
+                <div className="mt-auto">
+                  <h3 className="text-2xl font-bold">{title}</h3>
+                  <p className="mt-3 leading-6 text-muted-foreground">{copy}</p>
+                  <span className="mt-6 inline-flex items-center gap-2 font-semibold text-primary">Entrer <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
 function Home() {
-  const { settings, history, favorites, ready } = useStore();
+  const { settings } = useStore();
   return (
     <div className="pb-10">
       <Hero />
-      <div className="-mt-10 relative">
-        {ready && history.length > 0 && <Row title="Vu récemment" items={history.slice(0, 18)} />}
+      <About />
+      <div className="border-t border-border pt-10">
         {(Object.keys(CATEGORIES) as Kind[]).filter((k) => settings.categories[k]).map((k) => <KindRow key={k} kind={k} />)}
-        {ready && favorites.length > 0 && <Row title="Ma liste" items={favorites.slice(0, 18)} to="/ma-liste" />}
       </div>
     </div>
   );

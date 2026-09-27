@@ -10,6 +10,8 @@ export const Route = createFileRoute("/manga")({
       { name: "description", content: "Animés japonais : shonen, shojo, seinen, isekai, mecha, slice of life et plus, avec lecture des scans." },
       { property: "og:title", content: "Animé Manga — MovieVerse" },
       { property: "og:description", content: "Animés japonais par genre et lecture des scans." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => <Catalog kind="manga" genre={Route.useSearch().genre ?? null} />,

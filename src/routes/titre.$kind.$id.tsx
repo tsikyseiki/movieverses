@@ -21,6 +21,8 @@ export const Route = createFileRoute("/titre/$kind/$id")({
       { name: "description", content: "Synopsis, bande-annonce, casting, disponibilité et titres similaires." },
       { property: "og:title", content: "Fiche détaillée — MovieVerse" },
       { property: "og:description", content: "Synopsis, bande-annonce, casting et recommandations." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: DetailPage,
