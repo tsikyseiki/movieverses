@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep `/` as the MovieVerse presentation page; the three catalogues remain separate at `/films`, `/manga`, and `/occidental` so visitors explicitly enter the experience.

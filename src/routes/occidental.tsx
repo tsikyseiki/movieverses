@@ -10,6 +10,8 @@ export const Route = createFileRoute("/occidental")({
       { name: "description", content: "Séries animées occidentales : action, comédie, super-héros, science-fiction, famille." },
       { property: "og:title", content: "Animé Occidental — MovieVerse" },
       { property: "og:description", content: "Les meilleures séries animées occidentales par genre." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => <Catalog kind="occidental" genre={Route.useSearch().genre ?? null} />,
