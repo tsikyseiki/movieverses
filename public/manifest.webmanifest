@@ -1,0 +1,9 @@
+{
+  "name": "MovieVerse",
+  "short_name": "MovieVerse",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#15141c",
+  "theme_color": "#15141c",
+  "icons": [{ "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }]
+}
