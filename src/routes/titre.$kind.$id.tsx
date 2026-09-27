@@ -8,6 +8,8 @@ import { useStore, itemKey } from "@/lib/store";
 import { PosterCard } from "@/components/mv/PosterCard";
 import { ErrorNotice } from "@/components/mv/ErrorNotice";
 import { cn } from "@/lib/utils";
+import { shareItem } from "@/lib/community";
+import { ReviewForm } from "@/components/mv/ReviewForm";
 
 const KINDS: Kind[] = ["film", "manga", "occidental"];
 
@@ -65,8 +67,8 @@ function DetailPage() {
   const fav = isFavorite(d);
   const mine = ratings[itemKey(d)] ?? 0;
   const share = async () => {
-    await navigator.clipboard.writeText(window.location.href);
-    toast.success("Lien copié dans le presse-papiers");
+    const r = await shareItem({ title: d.title, rating: d.rating, poster: d.poster, url: window.location.href });
+    if (r === "copied") toast.success("Lien copié dans le presse-papiers");
   };
   const favItem = { ...d, overview: d.overview.slice(0, 300), genreIds: d.genreIds ?? [] };
 
@@ -84,7 +86,7 @@ function DetailPage() {
             <Link to={CATEGORIES[kind].path as "/films"} className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">{CATEGORIES[kind].label}</Link>
             <h1 className="mt-3 text-4xl font-extrabold leading-none md:text-6xl">{d.title}</h1>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              {d.rating != null && <span className="flex items-center gap-1 text-base font-bold text-foreground"><Star className="h-5 w-5 fill-gold text-gold" />{d.rating.toFixed(1)}<span className="text-xs font-normal text-muted-foreground">/10 officiel</span></span>}
+              {d.rating != null && <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-4 py-1.5 text-xl font-extrabold text-scrim shadow-lg"><Star className="h-6 w-6 fill-current" />{d.rating.toFixed(1)}<span className="text-sm font-semibold">/10</span></span>}
               {d.date && <span className="flex items-center gap-1"><Calendar className="h-4 w-4" />{new Date(d.date).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}</span>}
               {d.runtime && <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{d.runtime}</span>}
             </div>
@@ -150,6 +152,7 @@ function DetailPage() {
             </div>
           </section>
         )}
+        <ReviewForm item={{ kind, item_id: d.id, title: d.title, poster: d.poster ?? null, rating: d.rating ?? null }} myRating={mine} />
         {d.cast.length > 0 && (
           <section>
             <h2 className="mb-4 text-2xl font-bold">{kind === "film" || kind === "occidental" ? "Casting principal" : "Personnages"}</h2>

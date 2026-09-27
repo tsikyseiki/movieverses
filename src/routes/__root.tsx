@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { StoreProvider } from "@/lib/store";
+import { registerVisitOnce } from "@/lib/community";
 import { Header } from "@/components/mv/Header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -87,6 +88,7 @@ function RootComponent() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
+    registerVisitOnce();
     const inIframe = window.self !== window.top;
     if ("serviceWorker" in navigator && !inIframe && import.meta.env.PROD) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});

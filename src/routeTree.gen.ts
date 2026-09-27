@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CommunauteRouteImport } from './routes/communaute'
 import { Route as FilmsRouteImport } from './routes/films'
 import { Route as MaListeRouteImport } from './routes/ma-liste'
 import { Route as MangaRouteImport } from './routes/manga'
@@ -20,6 +21,11 @@ import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunauteRoute = CommunauteRouteImport.update({
+  id: '/communaute',
+  path: '/communaute',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FilmsRoute = FilmsRouteImport.update({
@@ -55,6 +61,7 @@ const TitreKindIdRoute = TitreKindIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommunauteRoute: typeof CommunauteRoute
   FilmsRoute: typeof FilmsRoute
   MaListeRoute: typeof MaListeRoute
   MangaRoute: typeof MangaRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/communaute': {
+      id: '/communaute'
+      path: '/communaute'
+      fullPath: '/communaute'
+      preLoaderRoute: typeof CommunauteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/films': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommunauteRoute: CommunauteRoute,
   FilmsRoute: FilmsRoute,
   MaListeRoute: MaListeRoute,
   MangaRoute: MangaRoute,
