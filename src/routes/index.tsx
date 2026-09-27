@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowRight, Clapperboard, Film, Play, Sparkles, Tv } from "lucide-react";
-import { fetchFeatured, fetchRow, type Item, type Kind } from "@/lib/catalog";
+import { CATEGORIES, fetchFeatured, fetchRow, type Item, type Kind } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { PosterCard, PosterSkeleton } from "@/components/mv/PosterCard";
 import { Button } from "@/components/ui/button";
