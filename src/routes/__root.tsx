@@ -84,7 +84,9 @@ function RootComponent() {
   const [persister] = useState(() =>
     typeof window !== "undefined" ? createSyncStoragePersister({ storage: window.localStorage, key: "mv:cache" }) : undefined,
   );
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     const inIframe = window.self !== window.top;
     if ("serviceWorker" in navigator && !inIframe && import.meta.env.PROD) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
@@ -94,7 +96,7 @@ function RootComponent() {
     <StoreProvider>
       <Header />
       <main className="min-h-screen">
-        <Outlet />
+        {mounted ? <Outlet /> : <div className="h-[82vh] animate-pulse bg-muted" />}
       </main>
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
         MovieVerse · Données TMDB, AniList & MangaDex
