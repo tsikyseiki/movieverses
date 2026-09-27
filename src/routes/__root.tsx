@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { StoreProvider } from "@/lib/store";
+import { registerVisitOnce } from "@/lib/community";
 import { Header } from "@/components/mv/Header";
 import { Toaster } from "@/components/ui/sonner";
 
