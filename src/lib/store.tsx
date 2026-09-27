@@ -39,7 +39,7 @@ const key = (i: Pick<Item, "kind" | "id">) => `${i.kind}:${i.id}`;
 function load<T>(k: string, d: T): T {
   try {
     const v = localStorage.getItem(`mv:${k}`);
-    return v ? { ...(Array.isArray(d) ? {} : d), ...JSON.parse(v) } && JSON.parse(v) : d;
+    return v ? (JSON.parse(v) as T) : d;
   } catch {
     return d;
   }
