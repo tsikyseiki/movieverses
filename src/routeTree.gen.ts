@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FilmsRouteImport } from './routes/films'
+import { Route as MaListeRouteImport } from './routes/ma-liste'
 import { Route as MangaRouteImport } from './routes/manga'
 import { Route as OccidentalRouteImport } from './routes/occidental'
+import { Route as ScanIdRouteImport } from './routes/scan.$id'
+import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const FilmsRoute = FilmsRouteImport.update({
   id: '/films',
   path: '/films',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaListeRoute = MaListeRouteImport.update({
+  id: '/ma-liste',
+  path: '/ma-liste',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MangaRoute = MangaRouteImport.update({
@@ -34,39 +42,83 @@ const OccidentalRoute = OccidentalRouteImport.update({
   path: '/occidental',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScanIdRoute = ScanIdRouteImport.update({
+  id: '/scan/$id',
+  path: '/scan/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TitreKindIdRoute = TitreKindIdRouteImport.update({
+  id: '/titre/$kind/$id',
+  path: '/titre/$kind/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/films': typeof FilmsRoute
+  '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/scan/$id': typeof ScanIdRoute
+  '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/films': typeof FilmsRoute
+  '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/scan/$id': typeof ScanIdRoute
+  '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/films': typeof FilmsRoute
+  '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/scan/$id': typeof ScanIdRoute
+  '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/films' | '/manga' | '/occidental'
+  fullPaths:
+    | '/'
+    | '/films'
+    | '/ma-liste'
+    | '/manga'
+    | '/occidental'
+    | '/scan/$id'
+    | '/titre/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/films' | '/manga' | '/occidental'
-  id: '__root__' | '/' | '/films' | '/manga' | '/occidental'
+  to:
+    | '/'
+    | '/films'
+    | '/ma-liste'
+    | '/manga'
+    | '/occidental'
+    | '/scan/$id'
+    | '/titre/$kind/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/films'
+    | '/ma-liste'
+    | '/manga'
+    | '/occidental'
+    | '/scan/$id'
+    | '/titre/$kind/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FilmsRoute: typeof FilmsRoute
+  MaListeRoute: typeof MaListeRoute
   MangaRoute: typeof MangaRoute
   OccidentalRoute: typeof OccidentalRoute
+  ScanIdRoute: typeof ScanIdRoute
+  TitreKindIdRoute: typeof TitreKindIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FilmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ma-liste': {
+      id: '/ma-liste'
+      path: '/ma-liste'
+      fullPath: '/ma-liste'
+      preLoaderRoute: typeof MaListeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manga': {
       id: '/manga'
       path: '/manga'
@@ -99,14 +158,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OccidentalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scan/$id': {
+      id: '/scan/$id'
+      path: '/scan/$id'
+      fullPath: '/scan/$id'
+      preLoaderRoute: typeof ScanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/titre/$kind/$id': {
+      id: '/titre/$kind/$id'
+      path: '/titre/$kind/$id'
+      fullPath: '/titre/$kind/$id'
+      preLoaderRoute: typeof TitreKindIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FilmsRoute: FilmsRoute,
+  MaListeRoute: MaListeRoute,
   MangaRoute: MangaRoute,
   OccidentalRoute: OccidentalRoute,
+  ScanIdRoute: ScanIdRoute,
+  TitreKindIdRoute: TitreKindIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
