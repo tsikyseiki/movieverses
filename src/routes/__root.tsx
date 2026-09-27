@@ -87,6 +87,7 @@ function RootComponent() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
+    registerVisitOnce();
     const inIframe = window.self !== window.top;
     if ("serviceWorker" in navigator && !inIframe && import.meta.env.PROD) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
