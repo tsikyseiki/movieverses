@@ -63,7 +63,7 @@ export function SettingsSheet() {
             <Seg value={settings.theme} onChange={(theme) => setSettings({ theme })} options={[{ v: "dark", l: "Sombre" }, { v: "light", l: "Clair" }]} />
           </Section>
           <Section icon={Type} title={`Taille du texte · ${settings.fontSize}px`}>
-            <Slider min={13} max={21} step={1} value={[settings.fontSize]} onValueChange={([v]) => setSettings({ fontSize: v })} />
+            <Slider min={13} max={21} step={1} value={[settings.fontSize]} onValueChange={([v]) => setSettings({ fontSize: v ?? 16 })} />
           </Section>
           <Section icon={Globe} title="Langue du contenu">
             <Seg value={settings.lang} onChange={(lang) => setSettings({ lang })} options={[{ v: "fr-FR", l: "Français" }, { v: "en-US", l: "English" }]} />

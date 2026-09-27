@@ -79,7 +79,7 @@ function Hero() {
   );
 }
 
-function Row({ title, items, loading, to }: { title: string; items?: Item[]; loading?: boolean; to?: string }) {
+function Row({ title, items, loading, to }: { title: string; items?: Item[] | undefined; loading?: boolean; to?: string }) {
   if (!loading && !items?.length) return null;
   return (
     <section className="mx-auto max-w-[1500px] px-4 py-6 md:px-8">

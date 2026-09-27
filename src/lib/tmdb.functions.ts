@@ -15,7 +15,7 @@ export const tmdbFetch = createServerFn({ method: "GET" })
     for (const [k, v] of Object.entries(data.params)) url.searchParams.set(k, v);
     const headers: Record<string, string> = { accept: "application/json" };
     // Supports both a v3 API key and a v4 read access token
-    if (key.length > 40) headers.authorization = `Bearer ${key}`;
+    if (key.length > 40) headers['authorization'] = `Bearer ${key}`;
     else url.searchParams.set("api_key", key);
     const res = await fetch(url, { headers });
     if (!res.ok) return { error: `http_${res.status}` as const, data: null };

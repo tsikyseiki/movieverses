@@ -10,7 +10,7 @@ export type Item = {
   rating: number | null; // /10
   date: string | null;
   overview: string;
-  genreIds?: number[];
+  genreIds?: number[] | undefined;
 };
 
 export const CATEGORIES: Record<Kind, { label: string; path: string; tagline: string }> = {
@@ -142,17 +142,17 @@ export async function fetchCatalog(kind: Kind, genre: string | null, page: numbe
     "vote_count.gte": "20",
   };
   if (kind === "film") {
-    if (g?.genre) params.with_genres = String(g.genre);
-    if (g?.keyword) params.with_keywords = String(g.keyword);
+    if (g?.genre) params["with_genres"] = String(g.genre);
+    if (g?.keyword) params["with_keywords"] = String(g.keyword);
     // Strict separation: animated films live under "Animation" only
-    if (g?.genre !== 16) params.without_genres = "16";
+    if (g?.genre !== 16) params["without_genres"] = "16";
     const d = await tmdb("/discover/movie", params);
     return { items: d.results.map((r: any) => mapTmdb("film", r)), next: page < Math.min(d.total_pages, 500) ? page + 1 : null };
   }
-  params.with_genres = g?.genre ? `16,${g.genre}` : "16";
-  if (g?.keyword) params.with_keywords = String(g.keyword);
-  params.with_origin_country = WEST_ORIGINS;
-  params.without_genres = "10762"; // no kids-only preschool noise
+  params["with_genres"] = g?.genre ? `16,${g.genre}` : "16";
+  if (g?.keyword) params["with_keywords"] = String(g.keyword);
+  params["with_origin_country"] = WEST_ORIGINS;
+  params["without_genres"] = "10762"; // no kids-only preschool noise
   const d = await tmdb("/discover/tv", params);
   const items = d.results
     .filter((r: any) => r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP"))
@@ -271,7 +271,7 @@ export async function searchAll(q: string, lang: string): Promise<Item[]> {
 export async function fetchUpcoming(genreIds: number[], lang: string): Promise<Item[]> {
   const today = new Date().toISOString().slice(0, 10);
   const params: Record<string, string> = { language: lang, "primary_release_date.gte": today, sort_by: "popularity.desc", without_genres: "16" };
-  if (genreIds.length) params.with_genres = genreIds.join("|");
+  if (genreIds.length) params["with_genres"] = genreIds.join("|");
   const d = await tmdb("/discover/movie", params);
   return d.results.slice(0, 10).map((r: any) => mapTmdb("film", r));
 }
@@ -280,7 +280,9 @@ export function shuffle<T>(a: T[]): T[] {
   const b = [...a];
   for (let i = b.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [b[i], b[j]] = [b[j], b[i]];
+    const t = b[i]!;
+    b[i] = b[j]!;
+    b[j] = t;
   }
   return b;
 }

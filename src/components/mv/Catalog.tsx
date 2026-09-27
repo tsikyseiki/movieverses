@@ -24,7 +24,7 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
     const el = sentinel.current;
     if (!el) return;
     const io = new IntersectionObserver((e) => {
-      if (e[0].isIntersecting && q.hasNextPage && !q.isFetchingNextPage) q.fetchNextPage();
+      if (e[0]?.isIntersecting && q.hasNextPage && !q.isFetchingNextPage) q.fetchNextPage();
     }, { rootMargin: "1200px" });
     io.observe(el);
     return () => io.disconnect();
