@@ -122,7 +122,8 @@ function CommunityAndVisits() {
         if (v != null) qc.setQueryData(["visits"], Number(v));
       })
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    const t = setTimeout(() => qc.invalidateQueries({ queryKey: ["visits"] }), 1500);
+    return () => { clearTimeout(t); supabase.removeChannel(ch); };
   }, [qc]);
   return (
     <section className="mx-auto max-w-[1500px] px-4 pt-16 md:px-8">
