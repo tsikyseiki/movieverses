@@ -16,7 +16,7 @@ export type Item = {
 export const CATEGORIES: Record<Kind, { label: string; path: string; tagline: string }> = {
   film: { label: "Films", path: "/films", tagline: "Le cinéma du monde entier" },
   manga: { label: "Animé Manga", path: "/manga", tagline: "L'animation japonaise" },
-  occidental: { label: "Animé Occidental", path: "/occidental", tagline: "Cartoons & séries animées" },
+  occidental: { label: "Animé Occidental", path: "/occidental", tagline: "Dessins animés et séries animées" },
 };
 
 type TmdbGenre = { slug: string; label: string; genre?: number; keyword?: number };
@@ -51,7 +51,7 @@ export const MANGA_GENRES: AniGenre[] = [
   { slug: "seinen", label: "Seinen", tag: "Seinen" },
   { slug: "isekai", label: "Isekai / Réincarnation", tag: "Isekai" },
   { slug: "mecha", label: "Mecha", genre: "Mecha" },
-  { slug: "slice-of-life", label: "Slice of Life", genre: "Slice of Life" },
+  { slug: "slice-of-life", label: "Tranche de vie", genre: "Slice of Life" },
   { slug: "horreur", label: "Horreur", genre: "Horror" },
   { slug: "sport", label: "Sport", genre: "Sports" },
   { slug: "fantastique", label: "Fantastique", genre: "Fantasy" },
@@ -103,6 +103,31 @@ function strip(s: string | null) {
 function aniDate(d: any) {
   if (!d?.year) return null;
   return `${d.year}-${String(d.month ?? 1).padStart(2, "0")}-${String(d.day ?? 1).padStart(2, "0")}`;
+}
+
+const ANI_GENRES_FR: Record<string, string> = {
+  Action: "Action",
+  Adventure: "Aventure",
+  Comedy: "Comédie",
+  Drama: "Drame",
+  Ecchi: "Ecchi",
+  Fantasy: "Fantastique",
+  Horror: "Horreur",
+  MahouShoujo: "Magical girl",
+  Mecha: "Mecha",
+  Music: "Musique",
+  Mystery: "Mystère",
+  Psychological: "Psychologique",
+  Romance: "Romance",
+  SciFi: "Science-fiction",
+  SliceOfLife: "Tranche de vie",
+  Sports: "Sport",
+  Supernatural: "Surnaturel",
+  Thriller: "Thriller",
+};
+
+function frenchAniGenre(genre: string): string {
+  return ANI_GENRES_FR[genre.replaceAll(" ", "")] ?? genre;
 }
 export function mapAni(m: any): Item {
   return {
@@ -198,12 +223,12 @@ export async function fetchDetail(kind: Kind, id: string, lang: string): Promise
     const base = mapAni(m);
     return {
       ...base,
-      genres: m.genres ?? [],
+      genres: (m.genres ?? []).map(frenchAniGenre),
       runtime: m.episodes ? `${m.episodes} épisodes${m.duration ? ` · ${m.duration} min` : ""}` : null,
       trailer: m.trailer?.site === "youtube" ? m.trailer.id : null,
       cast: (m.characters?.edges ?? []).map((e: any) => ({
         name: e.node.name.full,
-        role: e.voiceActors?.[0]?.name?.full ? `Doublé par ${e.voiceActors[0].name.full}` : e.role,
+         role: e.voiceActors?.[0]?.name?.full ? `Doublé par ${e.voiceActors[0].name.full}` : e.role === "MAIN" ? "Personnage principal" : "Personnage secondaire",
         photo: e.node.image?.medium ?? null,
       })),
       similar: (m.recommendations?.nodes ?? [])

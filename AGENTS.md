@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep `/` as the MovieVerse presentation page; the three catalogues remain separate at `/films`, `/manga`, and `/occidental` so visitors explicitly enter the experience.
+- Keep the entire user-facing experience in French and force catalogue requests to `fr-FR` so stored legacy preferences cannot switch languages.
