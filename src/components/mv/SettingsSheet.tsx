@@ -66,7 +66,7 @@ export function SettingsSheet() {
             <Slider min={13} max={21} step={1} value={[settings.fontSize]} onValueChange={([v]) => setSettings({ fontSize: v ?? 16 })} />
           </Section>
           <Section icon={Globe} title="Langue du contenu">
-            <Seg value={settings.lang} onChange={(lang) => setSettings({ lang })} options={[{ v: "fr-FR", l: "Français" }, { v: "en-US", l: "English" }]} />
+            <p className="rounded-lg bg-muted px-3 py-2 text-sm font-medium">Français</p>
           </Section>
           <Section icon={LayoutGrid} title="Affichage">
             <p className="mb-2 text-sm">Taille des cartes</p>

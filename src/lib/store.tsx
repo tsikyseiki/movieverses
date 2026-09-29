@@ -4,7 +4,7 @@ import type { Item, Kind } from "./catalog";
 export type Settings = {
   theme: "dark" | "light";
   fontSize: number;
-  lang: "fr-FR" | "en-US";
+  lang: "fr-FR";
   categories: Record<Kind, boolean>;
   cardSize: "compact" | "normal" | "large";
   autoplayHero: boolean;
@@ -55,7 +55,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [seenNotifs, setSeen] = useState<string[]>([]);
 
   useEffect(() => {
-    setS({ ...DEFAULT, ...load("settings", {}) });
+    setS({ ...DEFAULT, ...load("settings", {}), lang: "fr-FR" });
     setFav(load("favorites", []));
     setHist(load("history", []));
     setRatings(load("ratings", {}));
@@ -74,7 +74,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     settings,
     setSettings: (p) =>
       setS((s) => {
-        const n = { ...s, ...p };
+        const n = { ...s, ...p, lang: "fr-FR" as const };
         save("settings", n);
         return n;
       }),

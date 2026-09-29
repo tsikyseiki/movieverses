@@ -1,6 +1,8 @@
 {
   "name": "MovieVerse",
   "short_name": "MovieVerse",
+  "description": "Catalogue de films, d’animés manga et d’animés occidentaux.",
+  "lang": "fr",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#15141c",
