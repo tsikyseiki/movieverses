@@ -13,7 +13,7 @@ export const Route = createFileRoute("/communaute")({
       { title: "Avis & discussions — MovieVerse" },
       { name: "description", content: "Le fil communautaire MovieVerse : avis, notes, likes et commentaires sur films et animés." },
       { property: "og:title", content: "Avis & discussions — MovieVerse" },
-      { property: "og:description", content: "Partagez vos avis sur films et animés, likez et commentez." },
+      { property: "og:description", content: "Partagez vos avis sur les films et animés, aimez et commentez les publications." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

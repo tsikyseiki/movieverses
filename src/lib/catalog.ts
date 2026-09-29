@@ -104,6 +104,31 @@ function aniDate(d: any) {
   if (!d?.year) return null;
   return `${d.year}-${String(d.month ?? 1).padStart(2, "0")}-${String(d.day ?? 1).padStart(2, "0")}`;
 }
+
+const ANI_GENRES_FR: Record<string, string> = {
+  Action: "Action",
+  Adventure: "Aventure",
+  Comedy: "Comédie",
+  Drama: "Drame",
+  Ecchi: "Ecchi",
+  Fantasy: "Fantastique",
+  Horror: "Horreur",
+  MahouShoujo: "Magical girl",
+  Mecha: "Mecha",
+  Music: "Musique",
+  Mystery: "Mystère",
+  Psychological: "Psychologique",
+  Romance: "Romance",
+  SciFi: "Science-fiction",
+  SliceOfLife: "Tranche de vie",
+  Sports: "Sport",
+  Supernatural: "Surnaturel",
+  Thriller: "Thriller",
+};
+
+function frenchAniGenre(genre: string): string {
+  return ANI_GENRES_FR[genre.replaceAll(" ", "")] ?? genre;
+}
 export function mapAni(m: any): Item {
   return {
     kind: "manga",
@@ -198,7 +223,7 @@ export async function fetchDetail(kind: Kind, id: string, lang: string): Promise
     const base = mapAni(m);
     return {
       ...base,
-      genres: m.genres ?? [],
+      genres: (m.genres ?? []).map(frenchAniGenre),
       runtime: m.episodes ? `${m.episodes} épisodes${m.duration ? ` · ${m.duration} min` : ""}` : null,
       trailer: m.trailer?.site === "youtube" ? m.trailer.id : null,
       cast: (m.characters?.edges ?? []).map((e: any) => ({
