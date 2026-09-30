@@ -15,6 +15,7 @@ import { Route as FilmsRouteImport } from './routes/films'
 import { Route as MaListeRouteImport } from './routes/ma-liste'
 import { Route as MangaRouteImport } from './routes/manga'
 import { Route as OccidentalRouteImport } from './routes/occidental'
+import { Route as SportsRouteImport } from './routes/sports'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 
@@ -48,6 +49,11 @@ const OccidentalRoute = OccidentalRouteImport.update({
   path: '/occidental',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SportsRoute = SportsRouteImport.update({
+  id: '/sports',
+  path: '/sports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScanIdRoute = ScanIdRouteImport.update({
   id: '/scan/$id',
   path: '/scan/$id',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/sports': typeof SportsRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/sports': typeof SportsRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/sports': typeof SportsRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/sports'
     | '/scan/$id'
     | '/titre/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/sports'
     | '/scan/$id'
     | '/titre/$kind/$id'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/sports'
     | '/scan/$id'
     | '/titre/$kind/$id'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   MaListeRoute: typeof MaListeRoute
   MangaRoute: typeof MangaRoute
   OccidentalRoute: typeof OccidentalRoute
+  SportsRoute: typeof SportsRoute
   ScanIdRoute: typeof ScanIdRoute
   TitreKindIdRoute: typeof TitreKindIdRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OccidentalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sports': {
+      id: '/sports'
+      path: '/sports'
+      fullPath: '/sports'
+      preLoaderRoute: typeof SportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scan/$id': {
       id: '/scan/$id'
       path: '/scan/$id'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaListeRoute: MaListeRoute,
   MangaRoute: MangaRoute,
   OccidentalRoute: OccidentalRoute,
+  SportsRoute: SportsRoute,
   ScanIdRoute: ScanIdRoute,
   TitreKindIdRoute: TitreKindIdRoute,
 }
