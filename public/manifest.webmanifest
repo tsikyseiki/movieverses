@@ -1,11 +1,19 @@
 {
-  "name": "MovieVerse",
+  "id": "/",
+  "name": "MovieVerse — Films, animés & sports",
   "short_name": "MovieVerse",
-  "description": "Catalogue de films, d’animés manga et d’animés occidentaux.",
+  "description": "Catalogue gratuit de films, d’animés manga, d’animés occidentaux et de matchs en direct.",
   "lang": "fr",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#15141c",
-  "theme_color": "#15141c",
-  "icons": [{ "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }]
+  "orientation": "portrait",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "categories": ["entertainment", "sports"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

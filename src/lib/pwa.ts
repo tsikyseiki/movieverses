@@ -23,6 +23,6 @@ export async function setupOfflineApp() {
     await unregisterMovieVerseWorkers();
     return;
   }
-  const { registerSW } = await import("virtual:pwa-register");
-  registerSW({ immediate: true });
+  const reg = await navigator.serviceWorker.register(APP_SW_PATH).catch(() => null);
+  window.addEventListener("online", () => reg?.update().catch(() => {}));
 }
