@@ -1,50 +1,62 @@
-export type Sport = "football" | "basketball" | "tennis" | "autres";
-export type MatchStatus = "live" | "today" | "upcoming";
+import type { SportEvent } from "./sportsdb.functions";
 
-export type Team = { name: string; short: string; flag: string; country: string };
-export type Match = {
-  id: string;
-  sport: Sport;
-  competition: string;
-  venue: string;
-  home: Team;
-  away: Team;
-  homeScore?: number;
-  awayScore?: number;
-  status: MatchStatus;
-  minute?: number;
-  startsAt: string;
-  broadcasters: Record<string, string[]>;
-  stats?: { possession: [number, number]; shots: [number, number]; fouls: [number, number] };
-  highlightId?: string;
+export const SPORTS: { value: string; label: string }[] = [
+  { value: "all", label: "Tous les sports" },
+  { value: "Soccer", label: "Football" },
+  { value: "Basketball", label: "Basketball" },
+  { value: "Rugby", label: "Rugby" },
+  { value: "Fighting", label: "MMA & combat" },
+  { value: "Tennis", label: "Tennis" },
+  { value: "Ice Hockey", label: "Hockey sur glace" },
+  { value: "American Football", label: "Football américain" },
+  { value: "Motorsport", label: "Sports mécaniques" },
+  { value: "Baseball", label: "Baseball" },
+];
+
+export const sportLabel = (s: string) => SPORTS.find((x) => x.value === s)?.label ?? s;
+
+const FINISHED = ["FT", "AET", "AOT", "PEN", "Match Finished", "AP", "Ended", "Finished"];
+const NOT_STARTED = ["NS", "", "Not Started", "TBD", "Time to be defined"];
+const CANCELLED = ["PST", "CANC", "ABD", "Postponed", "Cancelled", "Abandoned"];
+
+export type Phase = "live" | "finished" | "scheduled" | "cancelled";
+export function phaseOf(e: SportEvent): Phase {
+  if (CANCELLED.includes(e.status)) return "cancelled";
+  if (FINISHED.includes(e.status)) return "finished";
+  if (NOT_STARTED.includes(e.status)) {
+    if (e.homeScore != null && e.startsAt && Date.parse(e.startsAt) < Date.now() - 3 * 3_600_000) return "finished";
+    return "scheduled";
+  }
+  return "live";
+}
+
+export const statusLabel = (e: SportEvent) => {
+  const p = phaseOf(e);
+  if (p === "finished") return "Terminé";
+  if (p === "cancelled") return "Reporté / annulé";
+  if (p === "live") return e.status === "HT" ? "Mi-temps" : `En cours · ${e.status}`;
+  return "À venir";
 };
 
-const now = Date.now();
-const at = (hours: number) => new Date(now + hours * 3_600_000).toISOString();
-
-export const SPORTS: { value: "all" | Sport; label: string }[] = [
-  { value: "all", label: "Tous les sports" },
-  { value: "football", label: "Football" },
-  { value: "basketball", label: "Basketball" },
-  { value: "tennis", label: "Tennis" },
-  { value: "autres", label: "Autres" },
-];
-
-export const MATCHES: Match[] = [
-  { id: "ucl-psg-rma", sport: "football", competition: "Ligue des champions", venue: "Parc des Princes", home: { name: "Paris SG", short: "PSG", flag: "🇫🇷", country: "FR" }, away: { name: "Real Madrid", short: "RMA", flag: "🇪🇸", country: "ES" }, homeScore: 2, awayScore: 1, status: "live", minute: 67, startsAt: at(-1.2), broadcasters: { FR: ["Canal+ Foot"], MG: ["Canal+ Sport"], ES: ["Movistar Plus+"], DEFAULT: ["DAZN"] }, stats: { possession: [54, 46], shots: [12, 9], fouls: [8, 11] } },
-  { id: "nba-lal-bos", sport: "basketball", competition: "NBA", venue: "Crypto.com Arena", home: { name: "LA Lakers", short: "LAL", flag: "🟣", country: "US" }, away: { name: "Boston Celtics", short: "BOS", flag: "🟢", country: "US" }, homeScore: 86, awayScore: 82, status: "live", minute: 8, startsAt: at(-1.5), broadcasters: { FR: ["beIN Sports"], MG: ["Canal+ Sport"], US: ["NBA TV"], DEFAULT: ["NBA League Pass"] }, stats: { possession: [51, 49], shots: [68, 65], fouls: [14, 17] } },
-  { id: "atp-sinner-alcaraz", sport: "tennis", competition: "ATP Masters 1000", venue: "Court central", home: { name: "Jannik Sinner", short: "SIN", flag: "🇮🇹", country: "IT" }, away: { name: "Carlos Alcaraz", short: "ALC", flag: "🇪🇸", country: "ES" }, homeScore: 1, awayScore: 1, status: "live", minute: 94, startsAt: at(-2), broadcasters: { FR: ["Eurosport"], MG: ["Canal+ Sport"], DEFAULT: ["Tennis TV"] }, stats: { possession: [48, 52], shots: [31, 34], fouls: [2, 1] } },
-  { id: "fra-bel", sport: "football", competition: "Ligue des nations", venue: "Stade de France", home: { name: "France", short: "FRA", flag: "🇫🇷", country: "FR" }, away: { name: "Belgique", short: "BEL", flag: "🇧🇪", country: "BE" }, status: "today", startsAt: at(4), broadcasters: { FR: ["TF1"], MG: ["Canal+"], BE: ["RTBF"], DEFAULT: ["UEFA.tv"] } },
-  { id: "mad-bra", sport: "football", competition: "Match international", venue: "Stade Barea", home: { name: "Madagascar", short: "MAD", flag: "🇲🇬", country: "MG" }, away: { name: "Brésil", short: "BRA", flag: "🇧🇷", country: "BR" }, status: "upcoming", startsAt: at(51), broadcasters: { MG: ["TVM", "Canal+ Sport"], BR: ["Globo"], DEFAULT: ["FIFA+"] } },
-  { id: "sen-mar", sport: "football", competition: "Qualifications internationales", venue: "Stade Abdoulaye Wade", home: { name: "Sénégal", short: "SEN", flag: "🇸🇳", country: "SN" }, away: { name: "Maroc", short: "MAR", flag: "🇲🇦", country: "MA" }, status: "upcoming", startsAt: at(74), broadcasters: { SN: ["RTS"], MA: ["Arryadia"], FR: ["L'Équipe Live"], DEFAULT: ["FIFA+"] } },
-  { id: "f1-japan", sport: "autres", competition: "Formule 1 · Grand Prix du Japon", venue: "Suzuka", home: { name: "McLaren", short: "MCL", flag: "🟠", country: "GB" }, away: { name: "Ferrari", short: "FER", flag: "🔴", country: "IT" }, status: "upcoming", startsAt: at(98), broadcasters: { FR: ["Canal+"], MG: ["Canal+ Sport"], DEFAULT: ["F1 TV"] } },
-];
+export const isoDay = (offset: number) => {
+  const d = new Date(Date.now() + offset * 86_400_000);
+  return d.toISOString().slice(0, 10);
+};
 
 export const countryFromLocale = () => {
   if (typeof navigator === "undefined") return null;
-  const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-  return locale.split("-")[1]?.toUpperCase() ?? null;
+  return Intl.DateTimeFormat().resolvedOptions().locale.split("-")[1]?.toUpperCase() ?? null;
 };
 
-export const broadcastersFor = (match: Match, country: string | null) =>
-  (country && match.broadcasters[country]) || match.broadcasters["DEFAULT"] || [];
+/** Noms anglais (utilisés par TheSportsDB) des équipes nationales par code pays. */
+export const NATION_EN: Record<string, { en: string; fr: string }> = {
+  FR: { en: "France", fr: "France" }, MG: { en: "Madagascar", fr: "Madagascar" }, US: { en: "USA", fr: "États-Unis" },
+  ES: { en: "Spain", fr: "Espagne" }, BR: { en: "Brazil", fr: "Brésil" }, SN: { en: "Senegal", fr: "Sénégal" },
+  MA: { en: "Morocco", fr: "Maroc" }, BE: { en: "Belgium", fr: "Belgique" }, CA: { en: "Canada", fr: "Canada" },
+  CH: { en: "Switzerland", fr: "Suisse" }, DE: { en: "Germany", fr: "Allemagne" }, IT: { en: "Italy", fr: "Italie" },
+  GB: { en: "England", fr: "Angleterre" }, CI: { en: "Ivory Coast", fr: "Côte d’Ivoire" }, CM: { en: "Cameroon", fr: "Cameroun" },
+  DZ: { en: "Algeria", fr: "Algérie" }, TN: { en: "Tunisia", fr: "Tunisie" }, PT: { en: "Portugal", fr: "Portugal" },
+  AR: { en: "Argentina", fr: "Argentine" }, RE: { en: "Reunion", fr: "La Réunion" }, MU: { en: "Mauritius", fr: "Maurice" },
+};
+
+export const youtubeId = (url: string | null) => url?.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/)?.[1] ?? null;
