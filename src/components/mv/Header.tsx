@@ -26,6 +26,7 @@ export function Header() {
               {CATEGORIES[k].label}
             </Link>
           ))}
+          <Link to="/sports" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:text-foreground" activeProps={{ className: "!text-foreground bg-accent" }}>Sports</Link>
           <Link to="/ma-liste" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:text-foreground" activeProps={{ className: "!text-foreground bg-accent" }}>
             Ma liste
           </Link>
@@ -43,6 +44,7 @@ export function Header() {
             {CATEGORIES[k].label}
           </Link>
         ))}
+        <Link to="/sports" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Sports</Link>
         <Link to="/ma-liste" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Ma liste</Link>
       </nav>
     </header>

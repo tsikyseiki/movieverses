@@ -47,4 +47,4 @@ export const countryFromLocale = () => {
 };
 
 export const broadcastersFor = (match: Match, country: string | null) =>
-  (country && match.broadcasters[country]) || match.broadcasters.DEFAULT || [];
+  (country && match.broadcasters[country]) || match.broadcasters["DEFAULT"] || [];

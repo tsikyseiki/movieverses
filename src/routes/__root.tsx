@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts, type ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -9,6 +9,8 @@ import { StoreProvider } from "@/lib/store";
 import { registerVisitOnce } from "@/lib/community";
 import { Header } from "@/components/mv/Header";
 import { Toaster } from "@/components/ui/sonner";
+import { ConnectionStatus } from "@/components/mv/ConnectionStatus";
+import { setupOfflineApp } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -24,7 +26,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -54,7 +56,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" },
@@ -89,11 +92,11 @@ function RootComponent() {
   useEffect(() => {
     setMounted(true);
     registerVisitOnce();
-    const inIframe = window.self !== window.top;
-    if ("serviceWorker" in navigator && !inIframe && import.meta.env.PROD) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
-  }, []);
+    setupOfflineApp();
+    const back = () => queryClient.refetchQueries({ type: "active" });
+    window.addEventListener("online", back);
+    return () => window.removeEventListener("online", back);
+  }, [queryClient]);
   const content = (
     <StoreProvider>
       <Header />
@@ -101,8 +104,9 @@ function RootComponent() {
         {mounted ? <Outlet /> : <div className="h-[82vh] animate-pulse bg-muted" />}
       </main>
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        MovieVerse · Données TMDB, AniList & MangaDex
+        MovieVerse · 100 % gratuit · Données TMDB, AniList & MangaDex
       </footer>
+      <ConnectionStatus />
       <Toaster />
     </StoreProvider>
   );
