@@ -24,9 +24,9 @@ function Reset() {
   const [pw, setPw] = useState("");
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw.length < 8) return toast.error("8 caractères minimum");
+    if (pw.length < 8) { toast.error("8 caractères minimum"); return; }
     const { error } = await supabase.auth.updateUser({ password: pw });
-    if (error) return toast.error("Lien expiré, recommencez.");
+    if (error) { toast.error("Lien expiré, recommencez."); return; }
     toast.success("Mot de passe mis à jour.");
     nav({ to: "/profil" });
   };

@@ -54,7 +54,7 @@ function Profile() {
       birth_date: n("birth_date"), updated_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("profiles").upsert(row);
-    if (error) return toast.error("Enregistrement impossible : vérifiez les champs.");
+    if (error) { toast.error("Enregistrement impossible : vérifiez les champs."); return; }
     toast.success("Profil enregistré.");
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
   };
