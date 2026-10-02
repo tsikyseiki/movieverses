@@ -5,6 +5,7 @@ import { SearchBar } from "./SearchBar";
 import { SettingsSheet } from "./SettingsSheet";
 import { Notifications } from "./Notifications";
 import { cn } from "@/lib/utils";
+import { AccountButton, InstallButton } from "./AccountButton";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -33,7 +34,9 @@ export function Header() {
         </nav>
         <div className="ml-auto flex flex-1 items-center justify-end gap-1">
           <div className="hidden flex-1 justify-end sm:flex"><SearchBar /></div>
+          <InstallButton />
           <Notifications />
+          <AccountButton />
           <SettingsSheet />
         </div>
       </div>
