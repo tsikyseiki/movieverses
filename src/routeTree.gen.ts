@@ -10,18 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CommunauteRouteImport } from './routes/communaute'
 import { Route as FilmsRouteImport } from './routes/films'
 import { Route as MaListeRouteImport } from './routes/ma-liste'
 import { Route as MangaRouteImport } from './routes/manga'
 import { Route as OccidentalRouteImport } from './routes/occidental'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SportsRouteImport } from './routes/sports'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunauteRoute = CommunauteRouteImport.update({
@@ -49,10 +63,25 @@ const OccidentalRoute = OccidentalRouteImport.update({
   path: '/occidental',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SportsRoute = SportsRouteImport.update({
   id: '/sports',
   path: '/sports',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ScanIdRoute = ScanIdRouteImport.update({
   id: '/scan/$id',
@@ -67,35 +96,48 @@ const TitreKindIdRoute = TitreKindIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/communaute': typeof CommunauteRoute
   '/films': typeof FilmsRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
   '/occidental': typeof OccidentalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/scan/$id': typeof ScanIdRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
@@ -103,45 +145,61 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/reset-password'
     | '/sports'
+    | '/admin'
+    | '/profil'
     | '/scan/$id'
     | '/titre/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/reset-password'
     | '/sports'
+    | '/admin'
+    | '/profil'
     | '/scan/$id'
     | '/titre/$kind/$id'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/communaute'
     | '/films'
     | '/ma-liste'
     | '/manga'
     | '/occidental'
+    | '/reset-password'
     | '/sports'
+    | '/_authenticated/admin'
+    | '/_authenticated/profil'
     | '/scan/$id'
     | '/titre/$kind/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CommunauteRoute: typeof CommunauteRoute
   FilmsRoute: typeof FilmsRoute
   MaListeRoute: typeof MaListeRoute
   MangaRoute: typeof MangaRoute
   OccidentalRoute: typeof OccidentalRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SportsRoute: typeof SportsRoute
   ScanIdRoute: typeof ScanIdRoute
   TitreKindIdRoute: typeof TitreKindIdRoute
@@ -154,6 +212,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/communaute': {
@@ -191,12 +263,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OccidentalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sports': {
       id: '/sports'
       path: '/sports'
       fullPath: '/sports'
       preLoaderRoute: typeof SportsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profil': {
+      id: '/_authenticated/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof AuthenticatedProfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/scan/$id': {
       id: '/scan/$id'
@@ -215,13 +308,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedProfilRoute: AuthenticatedProfilRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CommunauteRoute: CommunauteRoute,
   FilmsRoute: FilmsRoute,
   MaListeRoute: MaListeRoute,
   MangaRoute: MangaRoute,
   OccidentalRoute: OccidentalRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SportsRoute: SportsRoute,
   ScanIdRoute: ScanIdRoute,
   TitreKindIdRoute: TitreKindIdRoute,
