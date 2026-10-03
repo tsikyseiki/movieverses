@@ -7,6 +7,8 @@ import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchVisits } from "@/lib/community";
+import { CommunityFeed } from "@/components/mv/CommunityFeed";
+import { LiveNow } from "@/components/mv/LiveNow";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -126,21 +128,29 @@ function CommunityAndVisits() {
     return () => { clearTimeout(t); supabase.removeChannel(ch); };
   }, [qc]);
   return (
-    <section className="mx-auto max-w-[1500px] px-4 pt-16 md:px-8">
-      <div className="flex flex-col items-center gap-6 rounded-2xl border border-border bg-card p-10 text-center">
-        <MessagesSquare className="h-10 w-10 text-primary" />
-        <h2 className="text-3xl font-bold">Rejoignez la communauté</h2>
-        <p className="max-w-xl text-muted-foreground">Lisez les avis, likez les publications et discutez de vos titres préférés.</p>
-        <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
-          <Link to="/communaute">Avis & discussions <ArrowRight /></Link>
-        </Button>
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+    <>
+      <LiveNow />
+      <section id="avis" className="mx-auto max-w-2xl px-4 pt-16 md:px-8">
+        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+          <MessagesSquare className="h-9 w-9 text-primary" />
+          <h2 className="text-3xl font-bold">Avis & discussions</h2>
+          <p className="max-w-md text-sm text-muted-foreground">Les derniers avis de la communauté, en direct. Pour publier le vôtre, ouvrez la fiche d'un titre.</p>
+        </div>
+        <CommunityFeed limit={5} />
+        <div className="mt-6 text-center">
+          <Button asChild variant="outline" className="rounded-full">
+            <Link to="/communaute">Voir tous les avis <ArrowRight /></Link>
+          </Button>
+        </div>
+      </section>
+      <section className="mx-auto max-w-[1500px] px-4 pt-12 md:px-8">
+        <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Eye className="h-4 w-4" />
           <span className="text-lg font-bold tabular-nums text-foreground">{visits != null ? visits.toLocaleString("fr-FR") : "…"}</span> visites au total
           <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
         </p>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 

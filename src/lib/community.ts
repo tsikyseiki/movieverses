@@ -45,7 +45,11 @@ export async function fetchVisits() {
 }
 
 export async function fetchPosts() {
-  const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false }).limit(50);
+  const q = () => supabase.from("posts").select("*").order("created_at", { ascending: false }).limit(50);
+  // Avis masqués par la modération : exclus ; si la colonne n'existe pas encore, on charge tout
+  const first = await q().eq("hidden" as never, false as never);
+  if (!first.error) return first.data as Post[];
+  const { data, error } = await q();
   if (error) throw error;
   return data as Post[];
 }

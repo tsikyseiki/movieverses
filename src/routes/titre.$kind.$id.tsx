@@ -1,15 +1,24 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { BookOpen, Calendar, Clock, Heart, Play, Share2, Star } from "lucide-react";
+import { BookOpen, Calendar, Check, Clock, Heart, Play, Scale, Share2, Star } from "lucide-react";
 import { toast } from "sonner";
-import { CATEGORIES, fetchDetail, type Kind } from "@/lib/catalog";
+import { CATEGORIES, fetchConnections, fetchDetail, type Kind } from "@/lib/catalog";
 import { useStore, itemKey } from "@/lib/store";
 import { PosterCard } from "@/components/mv/PosterCard";
 import { ErrorNotice } from "@/components/mv/ErrorNotice";
 import { cn } from "@/lib/utils";
 import { shareItem } from "@/lib/community";
 import { ReviewForm } from "@/components/mv/ReviewForm";
+import { SpeakButton } from "@/components/mv/SpeakButton";
+import { AssistantChat } from "@/components/mv/AssistantChat";
+import { ReviewSummary } from "@/components/mv/ReviewSummary";
+import { AddToListMenu } from "@/components/mv/AddToListMenu";
+import { FallbackPoster } from "@/components/mv/FallbackPoster";
+import { Constellation } from "@/components/mv/Constellation";
+import { readableOn, rgbCss, useDominantColor } from "@/lib/color";
+import { predictRating } from "@/lib/insights";
+import { announceWatching } from "@/lib/presence";
 
 const KINDS: Kind[] = ["film", "manga", "occidental"];
 
@@ -46,7 +55,7 @@ function Stars({ value, onChange }: { value: number; onChange: (v: number) => vo
 
 function DetailPage() {
   const { kind, id } = Route.useParams() as { kind: Kind; id: string };
-  const { settings, pushHistory, isFavorite, toggleFavorite, ratings, rate } = useStore();
+  const { settings, pushHistory, isFavorite, toggleFavorite, ratings, rate, ratingMeta, markWatched, unmarkWatched, isWatched } = useStore();
   const { data: d, error, isLoading } = useQuery({
     queryKey: ["detail", kind, id, settings.lang],
     queryFn: () => fetchDetail(kind, id, settings.lang),
@@ -61,6 +70,20 @@ function DetailPage() {
     if (d) pushHistory({ kind: d.kind, id: d.id, title: d.title, poster: d.poster, backdrop: d.backdrop, rating: d.rating, date: d.date, overview: d.overview.slice(0, 300), genreIds: d.genreIds });
   }, [d?.id]);
 
+  const accent = useDominantColor(d?.poster ?? d?.backdrop ?? null);
+  const conns = useQuery({
+    queryKey: ["connections", kind, id, settings.lang],
+    queryFn: () => fetchConnections(kind, id, settings.lang),
+    enabled: !!d,
+    staleTime: 60 * 60_000,
+    retry: 1,
+  });
+  useEffect(() => {
+    if (!d) return;
+    announceWatching({ kind: d.kind, id: d.id, title: d.title, poster: d.poster });
+    return () => announceWatching(null);
+  }, [d?.id]);
+
   if (error) return <div className="mx-auto max-w-3xl px-4 pt-32"><ErrorNotice error={error} /></div>;
   if (isLoading || !d) return <div className="h-[70vh] animate-pulse bg-muted" />;
 
@@ -71,6 +94,13 @@ function DetailPage() {
     if (r === "copied") toast.success("Lien copié dans le presse-papiers");
   };
   const favItem = { ...d, overview: d.overview.slice(0, 300), genreIds: d.genreIds ?? [] };
+  const watched = isWatched(d);
+  const toggleWatched = () => {
+    if (watched) { unmarkWatched(d); return; }
+    markWatched({ kind: d.kind, id: d.id, title: d.title, poster: d.poster, genres: d.genres, runtimeMin: d.runtimeMin });
+    toast.success("Ajouté à votre journal de visionnage");
+  };
+  const prediction = mine ? null : predictRating(d.genres, ratings, ratingMeta, d.rating);
 
   return (
     <div className="pb-16">
@@ -78,9 +108,11 @@ function DetailPage() {
         {d.backdrop && <img src={d.backdrop} alt="" className="absolute inset-0 h-full w-full object-cover animate-kenburns" />}
         <div className="absolute inset-0 bg-gradient-to-r from-scrim via-scrim/85 to-scrim/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        {accent && <div className="absolute inset-0 transition-opacity duration-700" style={{ background: `linear-gradient(120deg, ${rgbCss(accent, 0.4)}, transparent 60%)` }} />}
         <div className="relative mx-auto grid max-w-[1500px] gap-10 px-4 pb-12 pt-40 md:grid-cols-[280px_1fr] md:px-8 lg:pt-32">
           <div className="animate-rise mx-auto w-52 md:w-full">
-            {d.poster && <img src={d.poster.replace("w342", "w500")} alt={d.title} className="w-full rounded-2xl shadow-2xl ring-1 ring-border" />}
+            {!d.poster && <div className="aspect-[2/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-border"><FallbackPoster title={d.title} year={d.date?.slice(0, 4)} /></div>}
+            {d.poster && <img src={d.poster.replace("w342", "w500")} alt={d.title} className="w-full rounded-2xl shadow-2xl ring-1 ring-border" style={accent ? { boxShadow: `0 30px 80px -20px ${rgbCss(accent, 0.75)}`, borderColor: rgbCss(accent) } : undefined} />}
           </div>
           <div className="animate-rise" style={{ animationDelay: "100ms" }}>
             <Link to={CATEGORIES[kind].path as "/films"} className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">{CATEGORIES[kind].label}</Link>
@@ -91,12 +123,12 @@ function DetailPage() {
               {d.runtime && <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{d.runtime}</span>}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {d.genres.map((g) => <span key={g} className="rounded-full border border-border bg-background/40 px-3 py-1 text-xs backdrop-blur">{g}</span>)}
+              {d.genres.map((g) => <span key={g} className="rounded-full border border-border bg-background/40 px-3 py-1 text-xs backdrop-blur" style={accent ? { borderColor: rgbCss(accent, 0.8) } : undefined}>{g}</span>)}
             </div>
             <p className="mt-6 max-w-3xl leading-relaxed text-foreground/85">{d.overview || "Synopsis non disponible."}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               {d.trailer && (
-                <button onClick={() => { setPlaying(true); document.getElementById("trailer")?.scrollIntoView({ behavior: "smooth" }); }} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-[1.03]">
+                <button onClick={() => { setPlaying(true); document.getElementById("trailer")?.scrollIntoView({ behavior: "smooth" }); }} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-[1.03]" style={accent ? { backgroundColor: rgbCss(accent), color: readableOn(accent) } : undefined}>
                   <Play className="h-5 w-5 fill-current" /> Bande-annonce
                 </button>
               )}
@@ -111,11 +143,24 @@ function DetailPage() {
               <button onClick={share} className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-3 font-semibold backdrop-blur hover:bg-background/70">
                 <Share2 className="h-5 w-5" /> Partager
               </button>
+              <button onClick={toggleWatched} className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-3 font-semibold backdrop-blur hover:bg-background/70">
+                <Check className={cn("h-5 w-5", watched && "text-primary")} /> {watched ? "Vu" : "Marquer comme vu"}
+              </button>
+              <SpeakButton text={d.overview} />
+              <AddToListMenu item={{ kind: d.kind, id: d.id, title: d.title, poster: d.poster ?? null }} />
+              <Link to="/comparer" search={{ a: `${d.kind}:${d.id}`, b: undefined }} className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-5 py-3 font-semibold backdrop-blur hover:bg-background/70">
+                <Scale className="h-5 w-5" /> Comparer
+              </Link>
             </div>
             <div className="mt-8 grid max-w-3xl gap-6 sm:grid-cols-2">
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Ma note {mine ? `· ${mine}/10` : ""}</p>
-                <Stars value={mine} onChange={(v) => rate(d, v)} />
+                <Stars value={mine} onChange={(v) => rate(d, v, d.genres, d.title)} />
+                {prediction && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Note prédite pour vous : <span className="text-base font-bold text-foreground">{prediction.value.toFixed(1)}/10</span> (d'après {prediction.basedOn} de vos notes)
+                  </p>
+                )}
               </div>
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Disponibilité</p>
@@ -142,7 +187,7 @@ function DetailPage() {
             <h2 className="mb-4 text-2xl font-bold">Bande-annonce</h2>
             <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted ring-1 ring-border">
               {playing ? (
-                <iframe className="h-full w-full" src={`https://www.youtube-nocookie.com/embed/${d.trailer}?autoplay=1&rel=0`} title="Bande-annonce" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+                <iframe className="h-full w-full" src={`https://www.youtube-nocookie.com/embed/${d.trailer}?autoplay=1&rel=0${settings.subtitles ? "&cc_load_policy=1&cc_lang_pref=fr&hl=fr" : ""}`} title="Bande-annonce" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
               ) : (
                 <button onClick={() => setPlaying(true)} className="group absolute inset-0">
                   <img src={`https://i.ytimg.com/vi/${d.trailer}/hqdefault.jpg`} alt="" className="h-full w-full object-cover opacity-70 transition group-hover:opacity-90" />
@@ -165,6 +210,15 @@ function DetailPage() {
                 </div>
               ))}
             </div>
+          </section>
+        )}
+        <AssistantChat key={`${d.kind}:${d.id}`} title={d.title} kind={d.kind} year={d.date?.slice(0, 4)} overview={d.overview} genres={d.genres} />
+        <ReviewSummary title={d.title} kind={d.kind} year={d.date?.slice(0, 4)} />
+        {(conns.data?.length ?? 0) > 1 && (
+          <section>
+            <h2 className="text-2xl font-bold">Constellation</h2>
+            <p className="mb-4 text-sm text-muted-foreground">Les titres liés : même réalisateur, même studio, même saga ou univers partagé.</p>
+            <Constellation center={{ kind: d.kind, id: d.id, title: d.title, poster: d.poster }} connections={conns.data ?? []} />
           </section>
         )}
         {d.similar.length > 0 && (

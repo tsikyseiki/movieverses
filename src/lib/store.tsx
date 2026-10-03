@@ -1,9 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Item, Kind } from "./catalog";
+import type { RatingMeta, WatchEntry } from "./insights";
 
 export type Settings = {
-  theme: "dark" | "light";
+  theme: "dark" | "light" | "system";
+  family: boolean;
+  dataSaver: boolean;
   fontSize: number;
+  accent: "rouge" | "bleu" | "violet" | "vert" | "orange";
+  contrast: boolean;
+  reduceMotion: boolean;
+  subtitles: boolean;
   lang: "fr-FR";
   categories: Record<Kind, boolean>;
   cardSize: "compact" | "normal" | "large";
@@ -11,12 +18,20 @@ export type Settings = {
 };
 const DEFAULT: Settings = {
   theme: "dark",
+  family: false,
+  dataSaver: false,
   fontSize: 16,
+  accent: "rouge",
+  contrast: false,
+  reduceMotion: false,
+  subtitles: true,
   lang: "fr-FR",
   categories: { film: true, manga: true, occidental: true },
   cardSize: "normal",
   autoplayHero: true,
 };
+
+export type CloudData = { favorites?: Item[]; ratings?: Record<string, number>; ratingMeta?: RatingMeta; watched?: WatchEntry[] };
 
 type Store = {
   ready: boolean;
@@ -29,7 +44,13 @@ type Store = {
   pushHistory: (i: Item) => void;
   clearHistory: () => void;
   ratings: Record<string, number>;
-  rate: (i: Pick<Item, "kind" | "id">, v: number) => void;
+  rate: (i: Pick<Item, "kind" | "id">, v: number, genres?: string[], title?: string) => void;
+  ratingMeta: RatingMeta;
+  watched: WatchEntry[];
+  markWatched: (e: Omit<WatchEntry, "at">) => void;
+  unmarkWatched: (i: Pick<Item, "kind" | "id">) => void;
+  isWatched: (i: Pick<Item, "kind" | "id">) => boolean;
+  applyCloud: (d: CloudData, mode: "replace" | "union") => void;
   seenNotifs: string[];
   markSeen: (ids: string[]) => void;
 };
@@ -53,6 +74,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [history, setHist] = useState<Item[]>([]);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [seenNotifs, setSeen] = useState<string[]>([]);
+  const [ratingMeta, setMeta] = useState<RatingMeta>({});
+  const [watched, setWatched] = useState<WatchEntry[]>([]);
+
+  // Thème « Auto » : suit le réglage clair/sombre du téléphone en direct
+  useEffect(() => {
+    if (settings.theme !== "system") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const h = () => document.documentElement.classList.toggle("dark", mq.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, [settings.theme]);
 
   useEffect(() => {
     setS({ ...DEFAULT, ...load("settings", {}), lang: "fr-FR" });
@@ -60,13 +92,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setHist(load("history", []));
     setRatings(load("ratings", {}));
     setSeen(load("seen", []));
+    setMeta(load("ratingmeta", {}));
+    setWatched(load("watched", []));
     setReady(true);
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", settings.theme === "dark");
+    document.documentElement.classList.toggle("dark", settings.theme === "dark" || (settings.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
     document.documentElement.style.setProperty("--app-font-size", `${settings.fontSize}px`);
     document.documentElement.lang = settings.lang.slice(0, 2);
+    const root = document.documentElement;
+    const ACCENTS: Record<string, string> = { bleu: "oklch(0.6 0.2 255)", violet: "oklch(0.58 0.24 300)", vert: "oklch(0.6 0.17 150)", orange: "oklch(0.68 0.19 50)" };
+    const c = ACCENTS[settings.accent];
+    if (c) { root.style.setProperty("--primary", c); root.style.setProperty("--ring", c); }
+    else { root.style.removeProperty("--primary"); root.style.removeProperty("--ring"); }
+    root.classList.toggle("high-contrast", settings.contrast);
+    root.classList.toggle("reduce-motion", settings.reduceMotion);
   }, [settings]);
 
   const store: Store = {
@@ -98,12 +139,62 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setHist([]);
     },
     ratings,
-    rate: (i, v) =>
+    rate: (i, v, genres, title) => {
       setRatings((r) => {
         const n = { ...r, [key(i)]: v };
         save("ratings", n);
         return n;
+      });
+      if (genres?.length) {
+        setMeta((m) => {
+          const n = { ...m, [key(i)]: { genres, title: title ?? "" } };
+          save("ratingmeta", n);
+          return n;
+        });
+      }
+    },
+    ratingMeta,
+    watched,
+    markWatched: (e) =>
+      setWatched((w) => {
+        const n = [{ ...e, at: Date.now() }, ...w.filter((x) => key(x) !== key(e))].slice(0, 1000);
+        save("watched", n);
+        return n;
       }),
+    unmarkWatched: (i) =>
+      setWatched((w) => {
+        const n = w.filter((x) => key(x) !== key(i));
+        save("watched", n);
+        return n;
+      }),
+    isWatched: (i) => watched.some((x) => key(x) === key(i)),
+    applyCloud: (d, mode) => {
+      if (Array.isArray(d.favorites)) {
+        const incoming = d.favorites;
+        setFav((f) => {
+          const n = mode === "replace" ? incoming : [...f, ...incoming.filter((x) => !f.some((y) => key(y) === key(x)))];
+          save("favorites", n);
+          return n;
+        });
+      }
+      if (d.ratings && typeof d.ratings === "object") {
+        const incoming = d.ratings;
+        setRatings((r) => { const n = mode === "replace" ? incoming : { ...incoming, ...r }; save("ratings", n); return n; });
+      }
+      if (d.ratingMeta && typeof d.ratingMeta === "object") {
+        const incoming = d.ratingMeta;
+        setMeta((m) => { const n = mode === "replace" ? incoming : { ...incoming, ...m }; save("ratingmeta", n); return n; });
+      }
+      if (Array.isArray(d.watched)) {
+        const incoming = d.watched;
+        setWatched((w) => {
+          const merged = mode === "replace" ? incoming : [...w, ...incoming.filter((x) => !w.some((y) => key(y) === key(x)))];
+          const n = [...merged].sort((a, b) => b.at - a.at).slice(0, 1000);
+          save("watched", n);
+          return n;
+        });
+      }
+    },
     seenNotifs,
     markSeen: (ids) =>
       setSeen((s) => {

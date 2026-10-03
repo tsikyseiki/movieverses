@@ -3,6 +3,7 @@ import { Heart, Star } from "lucide-react";
 import type { Item } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { FallbackPoster } from "./FallbackPoster";
 
 export function PosterCard({ item, index = 0 }: { item: Item; index?: number }) {
   const { isFavorite, toggleFavorite } = useStore();
@@ -18,7 +19,7 @@ export function PosterCard({ item, index = 0 }: { item: Item; index?: number }) 
           {item.poster ? (
             <img src={item.poster} alt={item.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
           ) : (
-            <div className="flex h-full items-center justify-center p-3 text-center text-sm text-muted-foreground">{item.title}</div>
+            <FallbackPoster title={item.title} year={item.date?.slice(0, 4)} />
           )}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-scrim/95 to-transparent opacity-80" />
           {item.rating != null && (

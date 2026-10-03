@@ -1,4 +1,4 @@
-import { Menu, Moon, Sun, Type, Globe, LayoutGrid, Trash2, Heart, History } from "lucide-react";
+import { Settings as Cog, Moon, Sun, Type, Globe, LayoutGrid, Trash2, Heart, History, Palette, Accessibility, Gauge } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -38,8 +38,8 @@ export function SettingsSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button aria-label="Ouvrir le menu" className="rounded-full p-2 transition hover:bg-accent">
-          <Menu className="h-5 w-5" />
+        <button aria-label="Ouvrir les paramètres" className="rounded-full p-2 transition hover:bg-accent">
+          <Cog className="h-5 w-5" />
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
@@ -60,7 +60,23 @@ export function SettingsSheet() {
             </Link>
           </div>
           <Section icon={settings.theme === "dark" ? Moon : Sun} title="Apparence">
-            <Seg value={settings.theme} onChange={(theme) => setSettings({ theme })} options={[{ v: "dark", l: "Sombre" }, { v: "light", l: "Clair" }]} />
+            <Seg value={settings.theme} onChange={(theme) => setSettings({ theme })} options={[{ v: "dark", l: "Sombre" }, { v: "light", l: "Clair" }, { v: "system", l: "Auto" }]} />
+          </Section>
+          <Section icon={Gauge} title="Performance & contrôle">
+            <div className="space-y-3">
+              <label className="flex items-center justify-between gap-3 text-sm"><span>Économiseur de données<span className="block text-xs text-muted-foreground">Désactive le préchargement en arrière-plan</span></span><Switch checked={settings.dataSaver} onCheckedChange={(dataSaver) => setSettings({ dataSaver })} /></label>
+              <label className="flex items-center justify-between gap-3 text-sm"><span>Mode famille<span className="block text-xs text-muted-foreground">Masque horreur, thriller et crime dans les catalogues</span></span><Switch checked={settings.family} onCheckedChange={(family) => setSettings({ family })} /></label>
+            </div>
+          </Section>
+          <Section icon={Palette} title="Couleur du thème">
+            <Seg value={settings.accent} onChange={(accent) => setSettings({ accent })} options={[{ v: "rouge", l: "Rouge" }, { v: "bleu", l: "Bleu" }, { v: "violet", l: "Violet" }, { v: "vert", l: "Vert" }, { v: "orange", l: "Orange" }]} />
+          </Section>
+          <Section icon={Accessibility} title="Accessibilité">
+            <div className="space-y-3">
+              <label className="flex items-center justify-between text-sm">Contraste renforcé<Switch checked={settings.contrast} onCheckedChange={(contrast) => setSettings({ contrast })} /></label>
+              <label className="flex items-center justify-between text-sm">Réduire les animations<Switch checked={settings.reduceMotion} onCheckedChange={(reduceMotion) => setSettings({ reduceMotion })} /></label>
+              <label className="flex items-center justify-between text-sm">Sous-titres des bandes-annonces<Switch checked={settings.subtitles} onCheckedChange={(subtitles) => setSettings({ subtitles })} /></label>
+            </div>
           </Section>
           <Section icon={Type} title={`Taille du texte · ${settings.fontSize}px`}>
             <Slider min={13} max={21} step={1} value={[settings.fontSize]} onValueChange={([v]) => setSettings({ fontSize: v ?? 16 })} />

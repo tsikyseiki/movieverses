@@ -139,3 +139,12 @@
 @utility animate-kenburns {
   animation: kenburns 14s ease-out both;
 }
+
+/* Accessibilité */
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.high-contrast { --muted-foreground: oklch(0.82 0 0); --border: oklch(1 0 0 / 35%); }
+.high-contrast:not(.dark) { --muted-foreground: oklch(0.3 0 0); --border: oklch(0 0 0 / 45%); }
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

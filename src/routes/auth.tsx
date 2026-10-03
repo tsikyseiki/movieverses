@@ -36,8 +36,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) nav({ to: "/profil" }); });
-    const { data: sub } = supabase.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") nav({ to: "/profil" }); });
+    supabase.auth.getUser().then(({ data }) => { if (data.user) nav({ to: "/", replace: true }); });
+    const { data: sub } = supabase.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") nav({ to: "/", replace: true }); });
     return () => sub.subscription.unsubscribe();
   }, [nav]);
 
@@ -80,7 +80,7 @@ function AuthPage() {
         <h1 className="font-display text-3xl font-extrabold">
           {mode === "signup" ? "Créer un compte" : mode === "forgot" ? "Mot de passe oublié" : "Connexion"}
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">100 % gratuit · aucune carte bancaire.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Connectez-vous pour accéder au catalogue complet de films, animés et mangas. 100 % gratuit, aucune carte bancaire.</p>
         {mode !== "forgot" && (
           <>
             <Button variant="outline" className="mt-6 w-full" onClick={google} type="button">Continuer avec Google</Button>
