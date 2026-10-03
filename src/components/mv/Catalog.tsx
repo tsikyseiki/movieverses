@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Shuffle } from "lucide-react";
 import { CATEGORIES, fetchCatalog, genresFor, MissingKeyError, type Kind } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { PosterCard, PosterSkeleton, gridCols } from "./PosterCard";
