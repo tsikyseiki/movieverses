@@ -196,21 +196,3 @@ export function SurpriseReveal({ kind, genre, lang, filters, open, onClose }: Pr
     </div>
   );
 }
-
-export const SurpriseButton = ({
-  onClick,
-  className,
-}: {
-  onClick: () => void;
-  className?: string;
-}) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:brightness-110",
-      className,
-    )}
-  >
-    <Shuffle className="h-4 w-4" /> Surprends-moi
-  </button>
-);
