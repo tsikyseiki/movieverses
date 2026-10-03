@@ -7,5 +7,5 @@ export const SITE = {
   // AdSense : identifiant éditeur
   adsenseClient: "ca-pub-5925318826929862",
   // Adresse email de contact affichée sur les pages légales et « Contact » (à renseigner)
-  contactEmail: "",
+  contactEmail: "TON_EMAIL",
 };
