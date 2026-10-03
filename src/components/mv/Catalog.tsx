@@ -16,12 +16,11 @@ const RATINGS = [0, 5, 6, 7, 8];
 
 export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
   const { settings } = useStore();
-  const nav = useNavigate();
   const genres = genresFor(kind);
   const valid = genre && genres.some((g) => g.slug === genre) ? genre : null;
   const [year, setYear] = useState("");
   const [minRating, setMinRating] = useState(0);
-  const [rolling, setRolling] = useState(false);
+  const [surpriseOpen, setSurpriseOpen] = useState(false);
   const filters = { year: year || undefined, minRating: minRating || undefined, family: settings.family || undefined };
   const q = useInfiniteQuery({
     queryKey: ["catalog", kind, valid, settings.lang, year, minRating, !!settings.family],
@@ -41,19 +40,6 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
     io.observe(el);
     return () => io.disconnect();
   }, [q.hasNextPage, q.isFetchingNextPage, q.fetchNextPage]);
-
-  const surprise = async () => {
-    setRolling(true);
-    try {
-      const it = await fetchRandom(kind, valid, settings.lang, filters);
-      if (it) nav({ to: "/titre/$kind/$id", params: { kind: it.kind, id: it.id } });
-      else toast.info("Aucun titre ne correspond à ces filtres.");
-    } catch {
-      toast.error("Impossible de tirer un titre pour le moment.");
-    } finally {
-      setRolling(false);
-    }
-  };
 
   const seen = new Set<string>();
   const items = (q.data?.pages.flatMap((p) => p.items) ?? []).filter((i) => !seen.has(i.id) && seen.add(i.id));
