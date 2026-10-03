@@ -158,6 +158,7 @@ function RootComponent() {
           queryFn: ({ pageParam }) => fetchCatalog(k, null, pageParam, "fr-FR"),
           initialPageParam: 1,
           pages: 1,
+          getNextPageParam: (_l: unknown, all: unknown[]) => all.length + 1,
           staleTime: 10 * 60_000,
         });
       });
