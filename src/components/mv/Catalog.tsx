@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, RotateCcw, Shuffle } from "lucide-react";
-import { toast } from "sonner";
-import { CATEGORIES, fetchCatalog, fetchRandom, genresFor, MissingKeyError, type Kind } from "@/lib/catalog";
+import { Link } from "@tanstack/react-router";
+import { RotateCcw } from "lucide-react";
+import { CATEGORIES, fetchCatalog, genresFor, MissingKeyError, type Kind } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { PosterCard, PosterSkeleton, gridCols } from "./PosterCard";
 import { ErrorNotice } from "./ErrorNotice";
+import { SurpriseReveal } from "./SurpriseReveal";
 import { cn } from "@/lib/utils";
 
 const SELECT = "h-9 rounded-full border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
