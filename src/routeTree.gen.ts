@@ -11,17 +11,42 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BilanRouteImport } from './routes/bilan'
+import { Route as CalendrierRouteImport } from './routes/calendrier'
+import { Route as CeSoirRouteImport } from './routes/ce-soir'
+import { Route as ClassiquesRouteImport } from './routes/classiques'
 import { Route as CommunauteRouteImport } from './routes/communaute'
+import { Route as ComparerRouteImport } from './routes/comparer'
+import { Route as ConditionsRouteImport } from './routes/conditions'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DeveloppeursRouteImport } from './routes/developpeurs'
+import { Route as DonneesRouteImport } from './routes/donnees'
 import { Route as FilmsRouteImport } from './routes/films'
+import { Route as JournalRouteImport } from './routes/journal'
+import { Route as ListesRouteImport } from './routes/listes'
 import { Route as MaListeRouteImport } from './routes/ma-liste'
 import { Route as MangaRouteImport } from './routes/manga'
+import { Route as MembresRouteImport } from './routes/membres'
+import { Route as ModerationRouteImport } from './routes/moderation'
 import { Route as OccidentalRouteImport } from './routes/occidental'
+import { Route as PartageRouteImport } from './routes/partage'
+import { Route as RechercheRouteImport } from './routes/recherche'
+import { Route as ReconnaitreRouteImport } from './routes/reconnaitre'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SportsRouteImport } from './routes/sports'
+import { Route as StatutRouteImport } from './routes/statut'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
+import { Route as ListeCodeRouteImport } from './routes/liste.$code'
+import { Route as MembreIdRouteImport } from './routes/membre.$id'
+import { Route as PersonneIdRouteImport } from './routes/personne.$id'
 import { Route as ScanIdRouteImport } from './routes/scan.$id'
+import { Route as ApiPublicRatingsRouteImport } from './routes/api.public.ratings'
+import { Route as ApiPublicReviewsRouteImport } from './routes/api.public.reviews'
+import { Route as ApiPublicStatusRouteImport } from './routes/api.public.status'
 import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -33,9 +58,34 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BilanRoute = BilanRouteImport.update({
+  id: '/bilan',
+  path: '/bilan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendrierRoute = CalendrierRouteImport.update({
+  id: '/calendrier',
+  path: '/calendrier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CeSoirRoute = CeSoirRouteImport.update({
+  id: '/ce-soir',
+  path: '/ce-soir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassiquesRoute = ClassiquesRouteImport.update({
+  id: '/classiques',
+  path: '/classiques',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunauteRoute = CommunauteRouteImport.update({
@@ -43,9 +93,49 @@ const CommunauteRoute = CommunauteRouteImport.update({
   path: '/communaute',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComparerRoute = ComparerRouteImport.update({
+  id: '/comparer',
+  path: '/comparer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConditionsRoute = ConditionsRouteImport.update({
+  id: '/conditions',
+  path: '/conditions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloppeursRoute = DeveloppeursRouteImport.update({
+  id: '/developpeurs',
+  path: '/developpeurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonneesRoute = DonneesRouteImport.update({
+  id: '/donnees',
+  path: '/donnees',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FilmsRoute = FilmsRouteImport.update({
   id: '/films',
   path: '/films',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListesRoute = ListesRouteImport.update({
+  id: '/listes',
+  path: '/listes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaListeRoute = MaListeRouteImport.update({
@@ -58,9 +148,34 @@ const MangaRoute = MangaRouteImport.update({
   path: '/manga',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembresRoute = MembresRouteImport.update({
+  id: '/membres',
+  path: '/membres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModerationRoute = ModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OccidentalRoute = OccidentalRouteImport.update({
   id: '/occidental',
   path: '/occidental',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartageRoute = PartageRouteImport.update({
+  id: '/partage',
+  path: '/partage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RechercheRoute = RechercheRouteImport.update({
+  id: '/recherche',
+  path: '/recherche',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReconnaitreRoute = ReconnaitreRouteImport.update({
+  id: '/reconnaitre',
+  path: '/reconnaitre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -73,6 +188,11 @@ const SportsRoute = SportsRouteImport.update({
   path: '/sports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StatutRoute = StatutRouteImport.update({
+  id: '/statut',
+  path: '/statut',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -83,9 +203,39 @@ const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   path: '/profil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ListeCodeRoute = ListeCodeRouteImport.update({
+  id: '/liste/$code',
+  path: '/liste/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreIdRoute = MembreIdRouteImport.update({
+  id: '/membre/$id',
+  path: '/membre/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonneIdRoute = PersonneIdRouteImport.update({
+  id: '/personne/$id',
+  path: '/personne/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScanIdRoute = ScanIdRouteImport.update({
   id: '/scan/$id',
   path: '/scan/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRatingsRoute = ApiPublicRatingsRouteImport.update({
+  id: '/api/public/ratings',
+  path: '/api/public/ratings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicReviewsRoute = ApiPublicReviewsRouteImport.update({
+  id: '/api/public/reviews',
+  path: '/api/public/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
+  id: '/api/public/status',
+  path: '/api/public/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TitreKindIdRoute = TitreKindIdRouteImport.update({
@@ -96,112 +246,287 @@ const TitreKindIdRoute = TitreKindIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/auth': typeof AuthRoute
+  '/bilan': typeof BilanRoute
+  '/calendrier': typeof CalendrierRoute
+  '/ce-soir': typeof CeSoirRoute
+  '/classiques': typeof ClassiquesRoute
   '/communaute': typeof CommunauteRoute
+  '/comparer': typeof ComparerRoute
+  '/conditions': typeof ConditionsRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/contact': typeof ContactRoute
+  '/developpeurs': typeof DeveloppeursRoute
+  '/donnees': typeof DonneesRoute
   '/films': typeof FilmsRoute
+  '/journal': typeof JournalRoute
+  '/listes': typeof ListesRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
+  '/membres': typeof MembresRoute
+  '/moderation': typeof ModerationRoute
   '/occidental': typeof OccidentalRoute
+  '/partage': typeof PartageRoute
+  '/recherche': typeof RechercheRoute
+  '/reconnaitre': typeof ReconnaitreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/statut': typeof StatutRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/profil': typeof AuthenticatedProfilRoute
+  '/liste/$code': typeof ListeCodeRoute
+  '/membre/$id': typeof MembreIdRoute
+  '/personne/$id': typeof PersonneIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/api/public/ratings': typeof ApiPublicRatingsRoute
+  '/api/public/reviews': typeof ApiPublicReviewsRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/auth': typeof AuthRoute
+  '/bilan': typeof BilanRoute
+  '/calendrier': typeof CalendrierRoute
+  '/ce-soir': typeof CeSoirRoute
+  '/classiques': typeof ClassiquesRoute
   '/communaute': typeof CommunauteRoute
+  '/comparer': typeof ComparerRoute
+  '/conditions': typeof ConditionsRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/contact': typeof ContactRoute
+  '/developpeurs': typeof DeveloppeursRoute
+  '/donnees': typeof DonneesRoute
   '/films': typeof FilmsRoute
+  '/journal': typeof JournalRoute
+  '/listes': typeof ListesRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
+  '/membres': typeof MembresRoute
+  '/moderation': typeof ModerationRoute
   '/occidental': typeof OccidentalRoute
+  '/partage': typeof PartageRoute
+  '/recherche': typeof RechercheRoute
+  '/reconnaitre': typeof ReconnaitreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/statut': typeof StatutRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/profil': typeof AuthenticatedProfilRoute
+  '/liste/$code': typeof ListeCodeRoute
+  '/membre/$id': typeof MembreIdRoute
+  '/personne/$id': typeof PersonneIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/api/public/ratings': typeof ApiPublicRatingsRoute
+  '/api/public/reviews': typeof ApiPublicReviewsRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/a-propos': typeof AProposRoute
   '/auth': typeof AuthRoute
+  '/bilan': typeof BilanRoute
+  '/calendrier': typeof CalendrierRoute
+  '/ce-soir': typeof CeSoirRoute
+  '/classiques': typeof ClassiquesRoute
   '/communaute': typeof CommunauteRoute
+  '/comparer': typeof ComparerRoute
+  '/conditions': typeof ConditionsRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/contact': typeof ContactRoute
+  '/developpeurs': typeof DeveloppeursRoute
+  '/donnees': typeof DonneesRoute
   '/films': typeof FilmsRoute
+  '/journal': typeof JournalRoute
+  '/listes': typeof ListesRoute
   '/ma-liste': typeof MaListeRoute
   '/manga': typeof MangaRoute
+  '/membres': typeof MembresRoute
+  '/moderation': typeof ModerationRoute
   '/occidental': typeof OccidentalRoute
+  '/partage': typeof PartageRoute
+  '/recherche': typeof RechercheRoute
+  '/reconnaitre': typeof ReconnaitreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sports': typeof SportsRoute
+  '/statut': typeof StatutRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
+  '/liste/$code': typeof ListeCodeRoute
+  '/membre/$id': typeof MembreIdRoute
+  '/personne/$id': typeof PersonneIdRoute
   '/scan/$id': typeof ScanIdRoute
+  '/api/public/ratings': typeof ApiPublicRatingsRoute
+  '/api/public/reviews': typeof ApiPublicReviewsRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/a-propos'
     | '/auth'
+    | '/bilan'
+    | '/calendrier'
+    | '/ce-soir'
+    | '/classiques'
     | '/communaute'
+    | '/comparer'
+    | '/conditions'
+    | '/confidentialite'
+    | '/contact'
+    | '/developpeurs'
+    | '/donnees'
     | '/films'
+    | '/journal'
+    | '/listes'
     | '/ma-liste'
     | '/manga'
+    | '/membres'
+    | '/moderation'
     | '/occidental'
+    | '/partage'
+    | '/recherche'
+    | '/reconnaitre'
     | '/reset-password'
     | '/sports'
+    | '/statut'
     | '/admin'
     | '/profil'
+    | '/liste/$code'
+    | '/membre/$id'
+    | '/personne/$id'
     | '/scan/$id'
+    | '/api/public/ratings'
+    | '/api/public/reviews'
+    | '/api/public/status'
     | '/titre/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/a-propos'
     | '/auth'
+    | '/bilan'
+    | '/calendrier'
+    | '/ce-soir'
+    | '/classiques'
     | '/communaute'
+    | '/comparer'
+    | '/conditions'
+    | '/confidentialite'
+    | '/contact'
+    | '/developpeurs'
+    | '/donnees'
     | '/films'
+    | '/journal'
+    | '/listes'
     | '/ma-liste'
     | '/manga'
+    | '/membres'
+    | '/moderation'
     | '/occidental'
+    | '/partage'
+    | '/recherche'
+    | '/reconnaitre'
     | '/reset-password'
     | '/sports'
+    | '/statut'
     | '/admin'
     | '/profil'
+    | '/liste/$code'
+    | '/membre/$id'
+    | '/personne/$id'
     | '/scan/$id'
+    | '/api/public/ratings'
+    | '/api/public/reviews'
+    | '/api/public/status'
     | '/titre/$kind/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/a-propos'
     | '/auth'
+    | '/bilan'
+    | '/calendrier'
+    | '/ce-soir'
+    | '/classiques'
     | '/communaute'
+    | '/comparer'
+    | '/conditions'
+    | '/confidentialite'
+    | '/contact'
+    | '/developpeurs'
+    | '/donnees'
     | '/films'
+    | '/journal'
+    | '/listes'
     | '/ma-liste'
     | '/manga'
+    | '/membres'
+    | '/moderation'
     | '/occidental'
+    | '/partage'
+    | '/recherche'
+    | '/reconnaitre'
     | '/reset-password'
     | '/sports'
+    | '/statut'
     | '/_authenticated/admin'
     | '/_authenticated/profil'
+    | '/liste/$code'
+    | '/membre/$id'
+    | '/personne/$id'
     | '/scan/$id'
+    | '/api/public/ratings'
+    | '/api/public/reviews'
+    | '/api/public/status'
     | '/titre/$kind/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AProposRoute: typeof AProposRoute
   AuthRoute: typeof AuthRoute
+  BilanRoute: typeof BilanRoute
+  CalendrierRoute: typeof CalendrierRoute
+  CeSoirRoute: typeof CeSoirRoute
+  ClassiquesRoute: typeof ClassiquesRoute
   CommunauteRoute: typeof CommunauteRoute
+  ComparerRoute: typeof ComparerRoute
+  ConditionsRoute: typeof ConditionsRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
+  ContactRoute: typeof ContactRoute
+  DeveloppeursRoute: typeof DeveloppeursRoute
+  DonneesRoute: typeof DonneesRoute
   FilmsRoute: typeof FilmsRoute
+  JournalRoute: typeof JournalRoute
+  ListesRoute: typeof ListesRoute
   MaListeRoute: typeof MaListeRoute
   MangaRoute: typeof MangaRoute
+  MembresRoute: typeof MembresRoute
+  ModerationRoute: typeof ModerationRoute
   OccidentalRoute: typeof OccidentalRoute
+  PartageRoute: typeof PartageRoute
+  RechercheRoute: typeof RechercheRoute
+  ReconnaitreRoute: typeof ReconnaitreRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SportsRoute: typeof SportsRoute
+  StatutRoute: typeof StatutRoute
+  ListeCodeRoute: typeof ListeCodeRoute
+  MembreIdRoute: typeof MembreIdRoute
+  PersonneIdRoute: typeof PersonneIdRoute
   ScanIdRoute: typeof ScanIdRoute
+  ApiPublicRatingsRoute: typeof ApiPublicRatingsRoute
+  ApiPublicReviewsRoute: typeof ApiPublicReviewsRoute
+  ApiPublicStatusRoute: typeof ApiPublicStatusRoute
   TitreKindIdRoute: typeof TitreKindIdRoute
 }
 
@@ -221,11 +546,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bilan': {
+      id: '/bilan'
+      path: '/bilan'
+      fullPath: '/bilan'
+      preLoaderRoute: typeof BilanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendrier': {
+      id: '/calendrier'
+      path: '/calendrier'
+      fullPath: '/calendrier'
+      preLoaderRoute: typeof CalendrierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ce-soir': {
+      id: '/ce-soir'
+      path: '/ce-soir'
+      fullPath: '/ce-soir'
+      preLoaderRoute: typeof CeSoirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classiques': {
+      id: '/classiques'
+      path: '/classiques'
+      fullPath: '/classiques'
+      preLoaderRoute: typeof ClassiquesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/communaute': {
@@ -235,11 +595,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunauteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comparer': {
+      id: '/comparer'
+      path: '/comparer'
+      fullPath: '/comparer'
+      preLoaderRoute: typeof ComparerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conditions': {
+      id: '/conditions'
+      path: '/conditions'
+      fullPath: '/conditions'
+      preLoaderRoute: typeof ConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developpeurs': {
+      id: '/developpeurs'
+      path: '/developpeurs'
+      fullPath: '/developpeurs'
+      preLoaderRoute: typeof DeveloppeursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donnees': {
+      id: '/donnees'
+      path: '/donnees'
+      fullPath: '/donnees'
+      preLoaderRoute: typeof DonneesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/films': {
       id: '/films'
       path: '/films'
       fullPath: '/films'
       preLoaderRoute: typeof FilmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listes': {
+      id: '/listes'
+      path: '/listes'
+      fullPath: '/listes'
+      preLoaderRoute: typeof ListesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ma-liste': {
@@ -256,11 +672,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MangaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membres': {
+      id: '/membres'
+      path: '/membres'
+      fullPath: '/membres'
+      preLoaderRoute: typeof MembresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moderation': {
+      id: '/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof ModerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/occidental': {
       id: '/occidental'
       path: '/occidental'
       fullPath: '/occidental'
       preLoaderRoute: typeof OccidentalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partage': {
+      id: '/partage'
+      path: '/partage'
+      fullPath: '/partage'
+      preLoaderRoute: typeof PartageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recherche': {
+      id: '/recherche'
+      path: '/recherche'
+      fullPath: '/recherche'
+      preLoaderRoute: typeof RechercheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reconnaitre': {
+      id: '/reconnaitre'
+      path: '/reconnaitre'
+      fullPath: '/reconnaitre'
+      preLoaderRoute: typeof ReconnaitreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -277,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/statut': {
+      id: '/statut'
+      path: '/statut'
+      fullPath: '/statut'
+      preLoaderRoute: typeof StatutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -291,11 +749,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/liste/$code': {
+      id: '/liste/$code'
+      path: '/liste/$code'
+      fullPath: '/liste/$code'
+      preLoaderRoute: typeof ListeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/$id': {
+      id: '/membre/$id'
+      path: '/membre/$id'
+      fullPath: '/membre/$id'
+      preLoaderRoute: typeof MembreIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personne/$id': {
+      id: '/personne/$id'
+      path: '/personne/$id'
+      fullPath: '/personne/$id'
+      preLoaderRoute: typeof PersonneIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scan/$id': {
       id: '/scan/$id'
       path: '/scan/$id'
       fullPath: '/scan/$id'
       preLoaderRoute: typeof ScanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ratings': {
+      id: '/api/public/ratings'
+      path: '/api/public/ratings'
+      fullPath: '/api/public/ratings'
+      preLoaderRoute: typeof ApiPublicRatingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/reviews': {
+      id: '/api/public/reviews'
+      path: '/api/public/reviews'
+      fullPath: '/api/public/reviews'
+      preLoaderRoute: typeof ApiPublicReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/status': {
+      id: '/api/public/status'
+      path: '/api/public/status'
+      fullPath: '/api/public/status'
+      preLoaderRoute: typeof ApiPublicStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/titre/$kind/$id': {
@@ -324,15 +824,40 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AProposRoute: AProposRoute,
   AuthRoute: AuthRoute,
+  BilanRoute: BilanRoute,
+  CalendrierRoute: CalendrierRoute,
+  CeSoirRoute: CeSoirRoute,
+  ClassiquesRoute: ClassiquesRoute,
   CommunauteRoute: CommunauteRoute,
+  ComparerRoute: ComparerRoute,
+  ConditionsRoute: ConditionsRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
+  ContactRoute: ContactRoute,
+  DeveloppeursRoute: DeveloppeursRoute,
+  DonneesRoute: DonneesRoute,
   FilmsRoute: FilmsRoute,
+  JournalRoute: JournalRoute,
+  ListesRoute: ListesRoute,
   MaListeRoute: MaListeRoute,
   MangaRoute: MangaRoute,
+  MembresRoute: MembresRoute,
+  ModerationRoute: ModerationRoute,
   OccidentalRoute: OccidentalRoute,
+  PartageRoute: PartageRoute,
+  RechercheRoute: RechercheRoute,
+  ReconnaitreRoute: ReconnaitreRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SportsRoute: SportsRoute,
+  StatutRoute: StatutRoute,
+  ListeCodeRoute: ListeCodeRoute,
+  MembreIdRoute: MembreIdRoute,
+  PersonneIdRoute: PersonneIdRoute,
   ScanIdRoute: ScanIdRoute,
+  ApiPublicRatingsRoute: ApiPublicRatingsRoute,
+  ApiPublicReviewsRoute: ApiPublicReviewsRoute,
+  ApiPublicStatusRoute: ApiPublicStatusRoute,
   TitreKindIdRoute: TitreKindIdRoute,
 }
 export const routeTree = rootRouteImport
