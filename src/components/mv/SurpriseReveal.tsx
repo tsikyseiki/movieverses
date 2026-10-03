@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2, RefreshCw, Shuffle, Star, X } from "lucide-react";
+import { ArrowRight, Loader2, RefreshCw, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { CATEGORIES, fetchRandom, type Kind } from "@/lib/catalog";
 
