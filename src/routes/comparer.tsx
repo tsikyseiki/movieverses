@@ -7,8 +7,8 @@ import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/comparer")({
   validateSearch: (s: Record<string, unknown>) => ({
-    a: typeof s.a === "string" ? s.a : undefined,
-    b: typeof s.b === "string" ? s.b : undefined,
+    a: typeof s["a"] === "string" ? s["a"] : undefined,
+    b: typeof s["b"] === "string" ? s["b"] : undefined,
   }),
   head: () => ({
     meta: [

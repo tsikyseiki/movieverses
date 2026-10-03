@@ -48,7 +48,7 @@ function DataCenter() {
       if (d["app"] !== "MovieVerse") throw new Error("format");
       const arr = (v: unknown) => (Array.isArray(v) ? v : undefined);
       const obj = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, never>) : undefined);
-      applyCloud({ favorites: arr(d["favorites"]), ratings: obj(d["ratings"]), ratingMeta: obj(d["ratingMeta"]), watched: arr(d["watched"]) }, "union");
+      applyCloud({ favorites: arr(d["favorites"]) ?? [], ratings: obj(d["ratings"]) ?? {}, ratingMeta: obj(d["ratingMeta"]) ?? {}, watched: arr(d["watched"]) ?? [] } as Parameters<typeof applyCloud>[0], "union");
       toast.success("Données importées et fusionnées avec les vôtres.");
     } catch {
       toast.error("Fichier invalide : choisissez un export MovieVerse (.json).");
