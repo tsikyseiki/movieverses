@@ -350,7 +350,7 @@ export async function fetchConnections(kind: Kind, id: string, lang: string): Pr
   if (director?.id) {
     tasks.push(
       tmdb(`/person/${director.id}/${t}_credits`, { language: lang }).then((r) => {
-        const list = (r.crew ?? []).filter((c: any) => kind === "tv" || c.job === "Director").sort((a: any, b: any) => (b.popularity ?? 0) - (a.popularity ?? 0));
+        const list = (r.crew ?? []).filter((c: any) => t === "tv" || c.job === "Director").sort((a: any, b: any) => (b.popularity ?? 0) - (a.popularity ?? 0));
         for (const x of list) if (okKind(x)) add(mapTmdb(kind, x), "director", director.name);
       }),
     );

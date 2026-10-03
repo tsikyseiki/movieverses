@@ -98,7 +98,7 @@ export function Header() {
         <Link to="/journal" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Journal</Link>
         <Link to="/ce-soir" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Ce soir</Link>
         <Link to="/calendrier" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Calendrier</Link>
-        <Link to="/comparer" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Comparer</Link>
+        <Link to="/comparer" search={{ a: undefined, b: undefined }} className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Comparer</Link>
         <Link to="/communaute" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Avis</Link>
         <Link to="/reconnaitre" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Affiche</Link>
         <Link to="/listes" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Listes</Link>
