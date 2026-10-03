@@ -72,10 +72,21 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
             <RotateCcw className="h-4 w-4" /> Réinitialiser
           </button>
         )}
-        <button onClick={surprise} disabled={rolling} className="ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 disabled:opacity-60">
-          {rolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shuffle className="h-4 w-4" />} Surprends-moi
+        <button
+          onClick={() => setSurpriseOpen(true)}
+          className="ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:brightness-110"
+        >
+          <Shuffle className="h-4 w-4" /> Surprends-moi
         </button>
       </div>
+      <SurpriseReveal
+        kind={kind}
+        genre={valid}
+        lang={settings.lang}
+        filters={filters}
+        open={surpriseOpen}
+        onClose={() => setSurpriseOpen(false)}
+      />
       {q.error ? (
         <ErrorNotice error={q.error} />
       ) : (
