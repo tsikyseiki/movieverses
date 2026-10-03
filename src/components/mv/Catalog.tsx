@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, RotateCcw, Shuffle } from "lucide-react";
-import { toast } from "sonner";
-import { CATEGORIES, fetchCatalog, fetchRandom, genresFor, MissingKeyError, type Kind } from "@/lib/catalog";
+import { Link } from "@tanstack/react-router";
+import { RotateCcw, Shuffle } from "lucide-react";
+import { CATEGORIES, fetchCatalog, genresFor, MissingKeyError, type Kind } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { PosterCard, PosterSkeleton, gridCols } from "./PosterCard";
 import { ErrorNotice } from "./ErrorNotice";
+import { SurpriseReveal } from "./SurpriseReveal";
 import { cn } from "@/lib/utils";
 
 const SELECT = "h-9 rounded-full border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -16,12 +16,11 @@ const RATINGS = [0, 5, 6, 7, 8];
 
 export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
   const { settings } = useStore();
-  const nav = useNavigate();
   const genres = genresFor(kind);
   const valid = genre && genres.some((g) => g.slug === genre) ? genre : null;
   const [year, setYear] = useState("");
   const [minRating, setMinRating] = useState(0);
-  const [rolling, setRolling] = useState(false);
+  const [surpriseOpen, setSurpriseOpen] = useState(false);
   const filters = { year: year || undefined, minRating: minRating || undefined, family: settings.family || undefined };
   const q = useInfiniteQuery({
     queryKey: ["catalog", kind, valid, settings.lang, year, minRating, !!settings.family],
@@ -41,19 +40,6 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
     io.observe(el);
     return () => io.disconnect();
   }, [q.hasNextPage, q.isFetchingNextPage, q.fetchNextPage]);
-
-  const surprise = async () => {
-    setRolling(true);
-    try {
-      const it = await fetchRandom(kind, valid, settings.lang, filters);
-      if (it) nav({ to: "/titre/$kind/$id", params: { kind: it.kind, id: it.id } });
-      else toast.info("Aucun titre ne correspond à ces filtres.");
-    } catch {
-      toast.error("Impossible de tirer un titre pour le moment.");
-    } finally {
-      setRolling(false);
-    }
-  };
 
   const seen = new Set<string>();
   const items = (q.data?.pages.flatMap((p) => p.items) ?? []).filter((i) => !seen.has(i.id) && seen.add(i.id));
@@ -86,10 +72,21 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
             <RotateCcw className="h-4 w-4" /> Réinitialiser
           </button>
         )}
-        <button onClick={surprise} disabled={rolling} className="ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 disabled:opacity-60">
-          {rolling ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shuffle className="h-4 w-4" />} Surprends-moi
+        <button
+          onClick={() => setSurpriseOpen(true)}
+          className="ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:brightness-110"
+        >
+          <Shuffle className="h-4 w-4" /> Surprends-moi
         </button>
       </div>
+      <SurpriseReveal
+        kind={kind}
+        genre={valid}
+        lang={settings.lang}
+        filters={filters}
+        open={surpriseOpen}
+        onClose={() => setSurpriseOpen(false)}
+      />
       {q.error ? (
         <ErrorNotice error={q.error} />
       ) : (
