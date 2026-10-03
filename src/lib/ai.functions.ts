@@ -8,19 +8,23 @@ async function gemini(opts: { system?: string; parts: GeminiPart[]; search?: boo
   const key = process.env["GEMINI_API_KEY"];
   if (!key) return { error: "missing_key" as const };
   const model = process.env["GEMINI_MODEL"] || "gemini-3.5-flash";
-  let res: Response;
-  try {
-    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+  const call = (search: boolean) =>
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
         ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
         contents: [{ role: "user", parts: opts.parts }],
-        ...(opts.search ? { tools: [{ google_search: {} }] } : {}),
+        ...(search ? { tools: [{ google_search: {} }] } : {}),
         generationConfig: { temperature: opts.json ? 0.1 : 0.4, maxOutputTokens: opts.maxTokens ?? 1200, ...(opts.json ? { responseMimeType: "application/json" } : {}) },
       }),
       signal: AbortSignal.timeout(30_000),
     });
+  let res: Response;
+  try {
+    res = await call(!!opts.search);
+    // Quota gratuit de la recherche Google épuisé : on répond quand même, sans recherche
+    if (res.status === 429 && opts.search) res = await call(false);
   } catch {
     return { error: "upstream" as const };
   }
