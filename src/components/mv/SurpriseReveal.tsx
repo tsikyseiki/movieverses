@@ -4,7 +4,7 @@ import { ArrowRight, Loader2, RefreshCw, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { CATEGORIES, fetchRandom, type Kind } from "@/lib/catalog";
 
-type Filters = { year?: string; minRating?: number; family?: boolean };
+type Filters = { year?: string | undefined; minRating?: number | undefined; family?: boolean | undefined };
 
 type Props = {
   kind: Kind;
