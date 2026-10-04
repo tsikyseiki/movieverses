@@ -138,6 +138,7 @@ function RootComponent() {
   const nav = useNavigate();
   const pathname = useRouterState({ select: (st) => st.location.pathname });
   const isPublic = PUBLIC_PATHS.includes(pathname.replace(/\/+$/, "") || "/");
+  const isAuthPage = pathname === "/auth";
   useEffect(() => {
     if (session === "out" && !isPublic) void nav({ to: "/auth", replace: true });
   }, [session, isPublic, nav]);
@@ -179,12 +180,12 @@ function RootComponent() {
     <StoreProvider>
       {session === "in" && <CloudSync />}
       {session === "in" && <CommandPalette />}
-      {session === "in" ? <Header /> : session === "out" ? <GuestHeader /> : null}
+      {session === "in" ? <Header /> : session === "out" && !isAuthPage ? <GuestHeader /> : null}
       <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Aller au contenu</a>
       <main id="contenu" tabIndex={-1} className="min-h-screen outline-none">
         {canShow ? <Outlet /> : <div className="h-[82vh] animate-pulse bg-muted" />}
       </main>
-      <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
+      {!isAuthPage && <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
         <nav className="mb-3 flex flex-wrap justify-center gap-x-5 gap-y-2" aria-label="Pied de page">
           <Link to="/a-propos" className="hover:text-foreground">À propos</Link>
           <Link to="/confidentialite" className="hover:text-foreground">Confidentialité</Link>
@@ -195,7 +196,7 @@ function RootComponent() {
         </nav>
         <p>MovieVerse · 100 % gratuit · Données TMDB, AniList & Internet Archive</p>
         <p className="mx-auto mt-1 max-w-xl">Ce produit utilise l'API de TMDB mais n'est ni approuvé ni certifié par TMDB.</p>
-      </footer>
+      </footer>}
       <ConsentBanner />
       <ConnectionStatus />
       <Toaster />
