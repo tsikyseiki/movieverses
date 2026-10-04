@@ -16,7 +16,7 @@ async function gemini(opts: { system?: string; parts: GeminiPart[]; search?: boo
         ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
         contents: [{ role: "user", parts: opts.parts }],
         ...(search ? { tools: [{ google_search: {} }] } : {}),
-        generationConfig: { temperature: opts.json ? 0.1 : 0.4, maxOutputTokens: opts.maxTokens ?? 1200, ...(opts.json ? { responseMimeType: "application/json" } : {}) },
+        generationConfig: { temperature: opts.json ? 0.1 : 0.4, maxOutputTokens: opts.maxTokens ?? 3000, ...(opts.json ? { responseMimeType: "application/json" } : {}) },
       }),
       signal: AbortSignal.timeout(30_000),
     });
@@ -70,7 +70,7 @@ export const summarizeReviews = createServerFn({ method: "POST" })
     if (limited(context.userId, 15)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
       search: true,
-      maxTokens: 900,
+      maxTokens: 2000,
       system: "Tu rédiges des synthèses de critiques, neutres, factuelles et sans spoiler, en français. N'invente aucun chiffre ni citation.",
       parts: [{ text: `Résume en UN SEUL paragraphe (90 à 120 mots) l'accueil critique de « ${data.title} » (${KIND[data.kind]}${data.year ? `, ${data.year}` : ""}) à partir de la presse et des sites de notes (Rotten Tomatoes, IMDb, Metacritic, MyAnimeList, Allociné…). Mentionne les points forts et les reproches qui reviennent le plus, et les notes ou scores trouvés en précisant leur source. Si les informations sont rares ou contradictoires, dis-le.` }],
     });
