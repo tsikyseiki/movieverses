@@ -117,10 +117,10 @@ alter table public.shared_watchlists enable row level security;
 alter table public.shared_watchlist_members enable row level security;
 alter table public.shared_watchlist_items enable row level security;
 create or replace function public.is_watchlist_member(_wl uuid) returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public as $body$
   select exists (select 1 from public.shared_watchlist_members where watchlist_id = _wl and user_id = auth.uid())
       or exists (select 1 from public.shared_watchlists where id = _wl and owner_id = auth.uid());
-$$;
+$body$;
 create policy "wl lecture membres" on public.shared_watchlists for select to authenticated using (public.is_watchlist_member(id));
 create policy "wl création" on public.shared_watchlists for insert to authenticated with check (owner_id = auth.uid());
 create policy "wl suppression propriétaire" on public.shared_watchlists for delete to authenticated using (owner_id = auth.uid());
@@ -130,14 +130,14 @@ create policy "wl items tout membres" on public.shared_watchlist_items for all t
   using (public.is_watchlist_member(watchlist_id)) with check (public.is_watchlist_member(watchlist_id));
 -- Rejoindre via le code (fonction sécurisée : le code fait office de clé)
 create or replace function public.join_watchlist(_code text) returns uuid
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public as $body$
 declare wl uuid;
 begin
   select id into wl from public.shared_watchlists where join_code = _code;
   if wl is null then raise exception 'Code invalide'; end if;
   insert into public.shared_watchlist_members (watchlist_id, user_id) values (wl, auth.uid()) on conflict do nothing;
   return wl;
-end $$;
+end $body$;
 alter publication supabase_realtime add table public.shared_watchlist_items;
 
 -- 6) Modération : signalements, masquage, permissions modérateur
