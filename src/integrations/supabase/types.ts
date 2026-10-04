@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          type: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           author: string
@@ -78,6 +120,7 @@ export type Database = {
           body: string
           comments_count: number
           created_at: string
+          hidden: boolean
           id: string
           item_id: string
           kind: string
@@ -92,6 +135,7 @@ export type Database = {
           body: string
           comments_count?: number
           created_at?: string
+          hidden?: boolean
           id?: string
           item_id: string
           kind: string
@@ -106,6 +150,7 @@ export type Database = {
           body?: string
           comments_count?: number
           created_at?: string
+          hidden?: boolean
           id?: string
           item_id?: string
           kind?: string
@@ -129,6 +174,7 @@ export type Database = {
           email: string | null
           gender: string | null
           id: string
+          is_public: boolean
           phone: string | null
           region: string | null
           updated_at: string
@@ -144,6 +190,7 @@ export type Database = {
           email?: string | null
           gender?: string | null
           id: string
+          is_public?: boolean
           phone?: string | null
           region?: string | null
           updated_at?: string
@@ -159,9 +206,163 @@ export type Database = {
           email?: string | null
           gender?: string | null
           id?: string
+          is_public?: boolean
           phone?: string | null
           region?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string | null
+          reason: string
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason: string
+          reporter_id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason?: string
+          reporter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_watchlist_items: {
+        Row: {
+          added_by: string
+          created_at: string
+          id: string
+          item_id: string
+          kind: string
+          poster: string | null
+          title: string
+          watched: boolean
+          watchlist_id: string
+        }
+        Insert: {
+          added_by?: string
+          created_at?: string
+          id?: string
+          item_id: string
+          kind: string
+          poster?: string | null
+          title: string
+          watched?: boolean
+          watchlist_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          kind?: string
+          poster?: string | null
+          title?: string
+          watched?: boolean
+          watchlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_watchlist_items_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "shared_watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_watchlist_members: {
+        Row: {
+          user_id: string
+          watchlist_id: string
+        }
+        Insert: {
+          user_id: string
+          watchlist_id: string
+        }
+        Update: {
+          user_id?: string
+          watchlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_watchlist_members_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "shared_watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_watchlists: {
+        Row: {
+          created_at: string
+          id: string
+          join_code: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          join_code?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          join_code?: string
+          name?: string
+          owner_id?: string
         }
         Relationships: []
       }
@@ -177,6 +378,89 @@ export type Database = {
         Update: {
           id?: number
           visits?: number
+        }
+        Relationships: []
+      }
+      user_data: {
+        Row: {
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_list_items: {
+        Row: {
+          item_id: string
+          kind: string
+          list_id: string
+          position: number
+          poster: string | null
+          title: string
+        }
+        Insert: {
+          item_id: string
+          kind: string
+          list_id: string
+          position?: number
+          poster?: string | null
+          title: string
+        }
+        Update: {
+          item_id?: string
+          kind?: string
+          list_id?: string
+          position?: number
+          poster?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_list_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "user_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_lists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          owner_id: string
+          share_code: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          owner_id: string
+          share_code?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          owner_id?: string
+          share_code?: string
+          title?: string
         }
         Relationships: []
       }
@@ -198,9 +482,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          points: number
+          ratings_count: number
+          trophies_count: number
+          updated_at: string
+          user_id: string
+          watched_count: number
+        }
+        Insert: {
+          points?: number
+          ratings_count?: number
+          trophies_count?: number
+          updated_at?: string
+          user_id: string
+          watched_count?: number
+        }
+        Update: {
+          points?: number
+          ratings_count?: number
+          trophies_count?: number
+          updated_at?: string
+          user_id?: string
+          watched_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          display_name: string | null
+          id: string | null
+          points: number | null
+          trophies_count: number | null
+          watched_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
@@ -210,6 +532,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_watchlist_member: { Args: { _wl: string }; Returns: boolean }
+      join_watchlist: { Args: { _code: string }; Returns: string }
       register_visit: { Args: never; Returns: number }
       toggle_like: { Args: { _device: string; _post: string }; Returns: number }
     }
