@@ -77,7 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -101,7 +101,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 // Pages accessibles sans être connecté
-const PUBLIC_PATHS = ["/auth", "/reset-password", "/developpeurs", "/confidentialite", "/conditions", "/a-propos", "/contact", "/statut"];
+const PUBLIC_PATHS = ["/auth", "/reset-password", "/aide", "/developpeurs", "/confidentialite", "/conditions", "/a-propos", "/contact", "/statut"];
 
 type SessionState = "loading" | "in" | "out";
 
@@ -188,6 +188,7 @@ function RootComponent() {
       {!isAuthPage && <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
         <nav className="mb-3 flex flex-wrap justify-center gap-x-5 gap-y-2" aria-label="Pied de page">
           <Link to="/a-propos" className="hover:text-foreground">À propos</Link>
+          <Link to="/aide" className="hover:text-foreground">Aide</Link>
           <Link to="/confidentialite" className="hover:text-foreground">Confidentialité</Link>
           <Link to="/conditions" className="hover:text-foreground">Conditions</Link>
           <Link to="/contact" className="hover:text-foreground">Contact</Link>
