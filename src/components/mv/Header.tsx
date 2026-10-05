@@ -1,11 +1,11 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CATEGORIES, type Kind } from "@/lib/catalog";
 import { SearchBar } from "./SearchBar";
 import { MainMenu } from "./MainMenu";
 import { ThemeToggle } from "./ThemeToggle";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, CircleHelp } from "lucide-react";
 import { useRole } from "@/lib/roles";
 import { SettingsSheet } from "./SettingsSheet";
 import { Notifications } from "./Notifications";
@@ -51,6 +51,7 @@ function MoreMenu() {
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const isHome = useRouterState({ select: (state) => state.location.pathname === "/" });
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 24);
     h();
@@ -65,11 +66,12 @@ export function Header() {
           Movie<span className="text-primary">Verse</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
-          {(Object.keys(CATEGORIES) as Kind[]).map((k) => (
+          {!isHome && (Object.keys(CATEGORIES) as Kind[]).map((k) => (
             <Link key={k} to={CATEGORIES[k].path as "/films"} className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:text-foreground" activeProps={{ className: "!text-foreground bg-accent" }}>
               {CATEGORIES[k].label}
             </Link>
           ))}
+          {isHome && <Link to="/aide" className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"><CircleHelp className="h-4 w-4" /> Aide</Link>}
           <Link to="/sports" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:text-foreground" activeProps={{ className: "!text-foreground bg-accent" }}>Sports</Link>
           <Link to="/ma-liste" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:text-foreground" activeProps={{ className: "!text-foreground bg-accent" }}>
             Ma liste
@@ -87,11 +89,12 @@ export function Header() {
       </div>
       <div className="px-4 pb-3 sm:hidden"><SearchBar /></div>
       <nav className="no-scrollbar flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden">
-        {(Object.keys(CATEGORIES) as Kind[]).map((k) => (
+        {!isHome && (Object.keys(CATEGORIES) as Kind[]).map((k) => (
           <Link key={k} to={CATEGORIES[k].path as "/films"} className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>
             {CATEGORIES[k].label}
           </Link>
         ))}
+        {isHome && <Link to="/aide" className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border px-3 py-1 text-xs"><CircleHelp className="h-3.5 w-3.5" /> Aide</Link>}
         <Link to="/sports" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Sports</Link>
         <Link to="/ma-liste" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Ma liste</Link>
         <Link to="/classiques" className="shrink-0 rounded-full border border-border px-3 py-1 text-xs" activeProps={{ className: "bg-primary text-primary-foreground border-primary" }}>Classiques</Link>

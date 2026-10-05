@@ -1,7 +1,7 @@
 # Feuille de route
 
-- [ ] Ajouter la page Matchs & Sports Live et ses données de démonstration.
-- [ ] Ajouter la localisation, les horaires locaux et les alertes par pays.
-- [ ] Harmoniser la palette cinéma sur l’ensemble de l’application.
-- [ ] Finaliser l’installation Android et le fonctionnement hors ligne contrôlé.
-- [ ] Vérifier la compilation et les parcours principaux sur mobile et ordinateur.
+- [x] Refaire l’accueil dans la direction « Cinematic Immersive Hub ».
+- [x] Faire ouvrir directement le catalogue Films depuis l’action principale.
+- [x] Ajouter une aide complète sur les fonctions et les rôles.
+- [x] Alléger la navigation de l’accueil et conserver son accès dans le menu principal.
+- [ ] Vérifier visuellement l’accueil et l’aide sur mobile et ordinateur.

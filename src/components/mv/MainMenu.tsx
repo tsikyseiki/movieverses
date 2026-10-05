@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
-  Activity, BarChart3, CalendarDays, Clapperboard, Code2, Database, FileText, Film, Home, Info, Landmark, ListPlus, LogOut, Mail, Medal,
+  Activity, BarChart3, CalendarDays, CircleHelp, Clapperboard, Code2, Database, FileText, Film, Home, Info, Landmark, ListPlus, LogOut, Mail, Medal,
   Menu, MessagesSquare, Moon, NotebookPen, ScanSearch, Scale, Search, ShieldAlert, ShieldCheck, SlidersHorizontal, Sparkles, Sun, Trophy, Tv, UserRound, Users, Heart,
   type LucideIcon,
 } from "lucide-react";
@@ -47,6 +47,7 @@ const SECTIONS: Section[] = [
     { to: "/donnees", label: "Données & confidentialité", hint: "Export, suppression, annonces", icon: Database },
   ] },
   { title: "Pro & aide", items: [
+    { to: "/aide", label: "Aide & mode d'emploi", hint: "Toutes les fonctions expliquées", icon: CircleHelp },
     { to: "/developpeurs", label: "API publique", hint: "Documentation et limites", icon: Code2 },
     { to: "/statut", label: "État du système", icon: Activity },
     { to: "/contact", label: "Contact & suggestions", icon: Mail },

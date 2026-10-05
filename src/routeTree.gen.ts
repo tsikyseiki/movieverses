@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AProposRouteImport } from './routes/a-propos'
+import { Route as AideRouteImport } from './routes/aide'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BilanRouteImport } from './routes/bilan'
 import { Route as CalendrierRouteImport } from './routes/calendrier'
@@ -61,6 +62,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AProposRoute = AProposRouteImport.update({
   id: '/a-propos',
   path: '/a-propos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AideRoute = AideRouteImport.update({
+  id: '/aide',
+  path: '/aide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -247,6 +253,7 @@ const TitreKindIdRoute = TitreKindIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/aide': typeof AideRoute
   '/auth': typeof AuthRoute
   '/bilan': typeof BilanRoute
   '/calendrier': typeof CalendrierRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/aide': typeof AideRoute
   '/auth': typeof AuthRoute
   '/bilan': typeof BilanRoute
   '/calendrier': typeof CalendrierRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/a-propos': typeof AProposRoute
+  '/aide': typeof AideRoute
   '/auth': typeof AuthRoute
   '/bilan': typeof BilanRoute
   '/calendrier': typeof CalendrierRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/a-propos'
+    | '/aide'
     | '/auth'
     | '/bilan'
     | '/calendrier'
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/a-propos'
+    | '/aide'
     | '/auth'
     | '/bilan'
     | '/calendrier'
@@ -452,6 +463,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/a-propos'
+    | '/aide'
     | '/auth'
     | '/bilan'
     | '/calendrier'
@@ -494,6 +506,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AProposRoute: typeof AProposRoute
+  AideRoute: typeof AideRoute
   AuthRoute: typeof AuthRoute
   BilanRoute: typeof BilanRoute
   CalendrierRoute: typeof CalendrierRoute
@@ -551,6 +564,13 @@ declare module '@tanstack/react-router' {
       path: '/a-propos'
       fullPath: '/a-propos'
       preLoaderRoute: typeof AProposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aide': {
+      id: '/aide'
+      path: '/aide'
+      fullPath: '/aide'
+      preLoaderRoute: typeof AideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -825,6 +845,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AProposRoute: AProposRoute,
+  AideRoute: AideRoute,
   AuthRoute: AuthRoute,
   BilanRoute: BilanRoute,
   CalendrierRoute: CalendrierRoute,
