@@ -40,7 +40,9 @@ function Members() {
       <div className="mt-8 space-y-2">
         {data?.map((m, i) => (
           <Link key={m.id} to="/membre/$id" params={{ id: m.id }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 hover:border-primary/60">
-            <span className="w-8 text-center text-lg font-extrabold">{["🥇", "🥈", "🥉"][i] ?? i + 1}</span>
+            <span className="flex w-8 justify-center">
+              {i < 3 ? <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-extrabold text-black" style={{ background: ["#f5c542", "#c0c7d1", "#d08a4e"][i] }}>{i + 1}</span> : <span className="text-sm font-bold text-muted-foreground">{i + 1}</span>}
+            </span>
             <Avatar m={m} />
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{m.display_name ?? "Membre"}</p>

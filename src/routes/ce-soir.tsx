@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, RefreshCw, Sparkles, Star } from "lucide-react";
+import { Ghost, Heart, Laugh, Loader2, Orbit, RefreshCw, Sparkles, Star, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { CATEGORIES, fetchTonight, type Item, type Kind, type Mood, type Tonight } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
@@ -18,9 +18,12 @@ export const Route = createFileRoute("/ce-soir")({
   component: TonightPage,
 });
 
-const MOODS: { v: Mood; l: string; e: string }[] = [
-  { v: "rire", l: "Rire", e: "😂" }, { v: "frissons", l: "Frissons", e: "😱" }, { v: "emotion", l: "Émotion", e: "🥹" },
-  { v: "action", l: "Action", e: "💥" }, { v: "reve", l: "Rêver", e: "✨" },
+const MOODS: { v: Mood; l: string; hint: string; Icon: typeof Laugh }[] = [
+  { v: "rire", l: "Rire", hint: "Comédies légères", Icon: Laugh },
+  { v: "frissons", l: "Frissons", hint: "Suspense et horreur", Icon: Ghost },
+  { v: "emotion", l: "Émotion", hint: "Drames et romances", Icon: Heart },
+  { v: "action", l: "Action", hint: "Adrénaline et aventure", Icon: Zap },
+  { v: "reve", l: "Évasion", hint: "Fantastique et science-fiction", Icon: Orbit },
 ];
 const KINDS: Kind[] = ["film", "manga", "occidental"];
 
@@ -63,7 +66,14 @@ function TonightPage() {
       <div className="mt-8 space-y-6 rounded-3xl border border-border bg-card p-6">
         <div>
           <p className="mb-2 font-semibold">1. Votre humeur</p>
-          <Chips value={t.mood} onChange={(mood) => setT({ ...t, mood })} options={MOODS.map((m) => ({ v: m.v, l: `${m.e} ${m.l}` }))} />
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {MOODS.map((m) => (
+              <button key={m.v} aria-pressed={t.mood === m.v} onClick={() => setT({ ...t, mood: m.v })} className={cn("flex items-center gap-3 rounded-2xl border p-3 text-left transition", t.mood === m.v ? "border-primary bg-primary/10" : "border-border hover:border-foreground/40")}>
+                <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", t.mood === m.v ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}><m.Icon className="h-5 w-5" /></span>
+                <span className="min-w-0"><span className="block text-sm font-semibold">{m.l}</span><span className="block truncate text-xs text-muted-foreground">{m.hint}</span></span>
+              </button>
+            ))}
+          </div>
         </div>
         <div>
           <p className="mb-2 font-semibold">2. Votre univers</p>

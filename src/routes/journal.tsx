@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock, Film, Star, Tag, Trash2 } from "lucide-react";
+import { Clapperboard, Clock, Compass, Crown, Film, Globe, Heart, Map as MapIcon, Medal, Orbit, Popcorn, Star, Tag, Timer, Trash2, Trophy as TrophyIcon, type LucideIcon } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { computeStats, formatDuration, trophies } from "@/lib/insights";
 import { CATEGORIES } from "@/lib/catalog";
@@ -16,6 +16,8 @@ export const Route = createFileRoute("/journal")({
   }),
   component: Journal,
 });
+
+const TROPHY_ICONS: Record<string, LucideIcon> = { clapperboard: Clapperboard, popcorn: Popcorn, trophy: TrophyIcon, crown: Crown, compass: Compass, map: MapIcon, globe: Globe, orbit: Orbit, star: Star, medal: Medal, heart: Heart, timer: Timer };
 
 function Card({ icon: Icon, label, value }: { icon: typeof Film; label: string; value: string }) {
   return (
@@ -57,7 +59,7 @@ function Journal() {
           return (
             <div key={t.id} className={`rounded-2xl border p-4 ${done ? "border-primary/60 bg-primary/10" : "border-border bg-card"}`}>
               <div className="flex items-center gap-3">
-                <span className={`text-3xl ${done ? "" : "opacity-40 grayscale"}`}>{t.emoji}</span>
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${done ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{(() => { const I = TROPHY_ICONS[t.icon] ?? Medal; return <I className="h-5 w-5" />; })()}</span>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{t.title}</p>
                   <p className="text-xs text-muted-foreground">{t.desc}</p>

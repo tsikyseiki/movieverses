@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Eye } from "lucide-react";
 import { subscribeLive, type LiveEntry } from "@/lib/presence";
 
 export function LiveNow() {
@@ -19,7 +20,7 @@ export function LiveNow() {
           <Link key={`${e.kind}:${e.id}`} to="/titre/$kind/$id" params={{ kind: e.kind, id: e.id }} className="group relative w-28 shrink-0">
             <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-muted ring-1 ring-border transition group-hover:ring-primary/60">
               {e.poster && <img src={e.poster} alt={e.title} loading="lazy" className="h-full w-full object-cover" />}
-              <span className="absolute right-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">👀 {e.count}</span>
+              <span className="absolute right-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground"><Eye className="mr-1 inline h-3 w-3" />{e.count}</span>
             </div>
             <p className="mt-1 line-clamp-1 text-xs font-semibold">{e.title}</p>
           </Link>

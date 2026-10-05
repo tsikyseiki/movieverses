@@ -12,16 +12,18 @@ const ERR: Record<string, string> = {
 };
 
 export function ReviewSummary({ title, kind, year }: { title: string; kind: Kind; year?: string | undefined }) {
-  const [state, setState] = useState<{ text: string; sources: { title: string; url: string }[] } | null>(null);
+  const [state, setState] = useState<{ text: string; sources: { title: string; url: string }[]; searched: boolean } | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const run = async () => {
     setLoading(true);
     setErr(null);
+    setDetail(null);
     try {
       const r = await summarizeReviews({ data: { title, kind, year } });
-      if (r.ok) setState({ text: r.text, sources: r.sources });
-      else setErr(ERR[r.error] ?? ERR["upstream"]!);
+      if (r.ok) setState({ text: r.text, sources: r.sources, searched: r.searched });
+      else { setErr(ERR[r.error] ?? ERR["upstream"]!); setDetail(r.detail ?? null); }
     } catch {
       setErr("Connectez-vous ou vérifiez votre connexion, puis réessayez.");
     } finally {
@@ -38,6 +40,7 @@ export function ReviewSummary({ title, kind, year }: { title: string; kind: Kind
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />} Résumer les critiques
           </button>
           {err && <p className="mt-3 text-sm text-destructive">{err}</p>}
+          {detail && <p className="mt-1 break-words text-[11px] text-muted-foreground">Détail technique : {detail}</p>}
         </div>
       ) : (
         <div className="mt-3 rounded-2xl border border-border bg-card p-5">
@@ -51,7 +54,7 @@ export function ReviewSummary({ title, kind, year }: { title: string; kind: Kind
               ))}
             </div>
           )}
-          <p className="mt-3 text-[11px] text-muted-foreground">Synthèse générée par IA à partir de sources web : elle peut contenir des erreurs.</p>
+          <p className="mt-3 text-[11px] text-muted-foreground">{state.searched ? "Synthèse générée par IA à partir de sources web : elle peut contenir des erreurs." : "Synthèse générée par IA à partir de ses connaissances (la recherche en ligne était indisponible) : elle peut être incomplète ou datée."}</p>
         </div>
       )}
     </section>

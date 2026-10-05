@@ -29,7 +29,7 @@ function Wrapped() {
   const max = Math.max(1, ...perMonth);
 
   const share = async () => {
-    const text = `Mon bilan MovieVerse ${year} : ${list.length} titres vus, ${formatDuration(minutes)} de visionnage${top[0] ? `, genre préféré : ${top[0][0]}` : ""} 🎬`;
+    const text = `Mon bilan MovieVerse ${year} : ${list.length} titres vus, ${formatDuration(minutes)} de visionnage${top[0] ? `, genre préféré : ${top[0][0]}` : ""}`;
     if (navigator.share) await navigator.share({ title: `Bilan MovieVerse ${year}`, text, url: window.location.origin }).catch(() => undefined);
     else { await navigator.clipboard?.writeText(text); toast.success("Texte copié"); }
   };
@@ -52,7 +52,7 @@ function Wrapped() {
             <div className="rounded-2xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Mois le plus actif</p><p className="mt-1 text-xl font-extrabold">{MONTHS[busiest]} · {perMonth[busiest]}</p></div>
             <div className="rounded-2xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Univers préféré</p><p className="mt-1 text-xl font-extrabold">{CATEGORIES[kinds[0]![0]].label}</p></div>
           </div>
-          {top.length > 0 && <div className="mt-4 rounded-2xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Vos 3 genres</p><div className="mt-2 flex flex-wrap gap-2">{top.map(([g, n], i) => <span key={g} className="rounded-full bg-primary/15 px-3 py-1 text-sm font-semibold text-primary">{["🥇", "🥈", "🥉"][i]} {g} · {n}</span>)}</div></div>}
+          {top.length > 0 && <div className="mt-4 rounded-2xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Vos 3 genres</p><div className="mt-2 flex flex-wrap gap-2">{top.map(([g, n], i) => <span key={g} className="rounded-full bg-primary/15 px-3 py-1 text-sm font-semibold text-primary">#{i + 1} {g} · {n}</span>)}</div></div>}
           {best && <div className="mt-4 rounded-2xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Votre coup de cœur</p><p className="mt-1 text-xl font-extrabold">{best.title} <span className="text-primary">{ratings[`${best.kind}:${best.id}`]}/10</span></p></div>}
           <div className="mt-4 rounded-2xl border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">Mois par mois</p>

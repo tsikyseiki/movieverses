@@ -76,23 +76,23 @@ export function computeStats(watched: WatchEntry[], ratings: Record<string, numb
   };
 }
 
-export type Trophy = { id: string; emoji: string; title: string; desc: string; value: number; goal: number };
+export type Trophy = { id: string; icon: string; title: string; desc: string; value: number; goal: number };
 
 export function trophies(s: Stats, ratingsCount: number, favoritesCount: number): Trophy[] {
   const hours = Math.floor(s.minutes / 60);
   return [
-    { id: "first", emoji: "🎬", title: "Premier pas", desc: "Marquer 1 titre comme vu", value: s.total, goal: 1 },
-    { id: "w10", emoji: "🍿", title: "Cinéphile", desc: "10 titres vus", value: s.total, goal: 10 },
-    { id: "w50", emoji: "🏆", title: "Passionné", desc: "50 titres vus", value: s.total, goal: 50 },
-    { id: "w100", emoji: "👑", title: "Légende", desc: "100 titres vus", value: s.total, goal: 100 },
-    { id: "g5", emoji: "🧭", title: "Curieux", desc: "Explorer 5 genres", value: s.genreCount, goal: 5 },
-    { id: "g10", emoji: "🗺️", title: "Explorateur", desc: "Explorer 10 genres", value: s.genreCount, goal: 10 },
-    { id: "g15", emoji: "🌌", title: "Globe-trotteur", desc: "Explorer 15 genres", value: s.genreCount, goal: 15 },
-    { id: "k3", emoji: "🪐", title: "Multi-univers", desc: "Voir un film, un animé manga et un animé occidental", value: s.kindCount, goal: 3 },
-    { id: "r10", emoji: "⭐", title: "Critique", desc: "Noter 10 titres", value: ratingsCount, goal: 10 },
-    { id: "r50", emoji: "🎖️", title: "Juré", desc: "Noter 50 titres", value: ratingsCount, goal: 50 },
-    { id: "f10", emoji: "❤️", title: "Collectionneur", desc: "10 titres dans Ma liste", value: favoritesCount, goal: 10 },
-    { id: "h24", emoji: "⏱️", title: "Marathonien", desc: "24 h de visionnage cumulées", value: hours, goal: 24 },
+    { id: "first", icon: "clapperboard", title: "Premier pas", desc: "Marquer 1 titre comme vu", value: s.total, goal: 1 },
+    { id: "w10", icon: "popcorn", title: "Cinéphile", desc: "10 titres vus", value: s.total, goal: 10 },
+    { id: "w50", icon: "trophy", title: "Passionné", desc: "50 titres vus", value: s.total, goal: 50 },
+    { id: "w100", icon: "crown", title: "Légende", desc: "100 titres vus", value: s.total, goal: 100 },
+    { id: "g5", icon: "compass", title: "Curieux", desc: "Explorer 5 genres", value: s.genreCount, goal: 5 },
+    { id: "g10", icon: "map", title: "Explorateur", desc: "Explorer 10 genres", value: s.genreCount, goal: 10 },
+    { id: "g15", icon: "globe", title: "Globe-trotteur", desc: "Explorer 15 genres", value: s.genreCount, goal: 15 },
+    { id: "k3", icon: "orbit", title: "Multi-univers", desc: "Voir un film, un animé manga et un animé occidental", value: s.kindCount, goal: 3 },
+    { id: "r10", icon: "star", title: "Critique", desc: "Noter 10 titres", value: ratingsCount, goal: 10 },
+    { id: "r50", icon: "medal", title: "Juré", desc: "Noter 50 titres", value: ratingsCount, goal: 50 },
+    { id: "f10", icon: "heart", title: "Collectionneur", desc: "10 titres dans Ma liste", value: favoritesCount, goal: 10 },
+    { id: "h24", icon: "timer", title: "Marathonien", desc: "24 h de visionnage cumulées", value: hours, goal: 24 },
   ];
 }
 
