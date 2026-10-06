@@ -56,6 +56,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gemini_key_usage: {
+        Row: {
+          day: string
+          error_count: number
+          key_name: string
+          last_at: string
+          last_status: string | null
+          ok_count: number
+          quota_count: number
+        }
+        Insert: {
+          day?: string
+          error_count?: number
+          key_name: string
+          last_at?: string
+          last_status?: string | null
+          ok_count?: number
+          quota_count?: number
+        }
+        Update: {
+          day?: string
+          error_count?: number
+          key_name?: string
+          last_at?: string
+          last_status?: string | null
+          ok_count?: number
+          quota_count?: number
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           author: string
@@ -534,6 +564,10 @@ export type Database = {
       }
       is_watchlist_member: { Args: { _wl: string }; Returns: boolean }
       join_watchlist: { Args: { _code: string }; Returns: string }
+      log_gemini_usage: {
+        Args: { _key: string; _status: string }
+        Returns: undefined
+      }
       register_visit: { Args: never; Returns: number }
       toggle_like: { Args: { _device: string; _post: string }; Returns: number }
     }
