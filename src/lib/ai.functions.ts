@@ -55,11 +55,17 @@ async function gemini(opts: { feature: GeminiFeature; system?: string; parts: Ge
   };
 
   const tokens = opts.maxTokens ?? 3000;
-  let r = await attempt(!!opts.search, tokens);
-  // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
-  // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
-  if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(false, Math.min(tokens * 2, 8000));
-  return r;
+  // Rotation des clés : si une clé a épuisé son quota, la suivante prend le relais.
+  for (const key of keys) {
+    let r = await attempt(key, !!opts.search, tokens);
+    // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
+    // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
+    if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(key, false, Math.min(tokens * 2, 8000));
+    if (!("error" in r)) return r;
+    // Seul le quota justifie d'essayer une autre clé ; les autres erreurs ne dépendent pas de la clé
+    if (r.error !== "quota") return r;
+  }
+  return { error: "quota", detail: "toutes les clés ont atteint leur quota du jour" };
 }
 
 const HITS = new Map<string, number[]>();
