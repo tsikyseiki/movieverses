@@ -1,18 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { geminiKeys, type GeminiFeature } from "@/lib/gemini-keys";
 
 // ---- Appel Gemini (partagé par les deux fonctions ci-dessous) ----
 type GeminiPart = { text?: string; inlineData?: { mimeType: string; data: string } };
 type GeminiOk = { text: string; sources: { title: string; url: string }[]; searched: boolean };
 type GeminiFail = { error: "missing_key" | "quota" | "upstream" | "empty"; detail?: string };
 
-async function gemini(opts: { system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }): Promise<GeminiOk | GeminiFail> {
-  const key = process.env["GEMINI_API_KEY"];
-  if (!key) return { error: "missing_key" };
+async function gemini(opts: { feature: GeminiFeature; system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }): Promise<GeminiOk | GeminiFail> {
+  const keys = geminiKeys(opts.feature);
+  if (!keys.length) return { error: "missing_key" };
   const model = process.env["GEMINI_MODEL"] || "gemini-3.5-flash";
 
-  const attempt = async (search: boolean, tokens: number): Promise<GeminiOk | GeminiFail> => {
+  const attempt = async (key: string, search: boolean, tokens: number): Promise<GeminiOk | GeminiFail> => {
     let res: Response;
     try {
       res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
@@ -54,11 +55,17 @@ async function gemini(opts: { system?: string; parts: GeminiPart[]; search?: boo
   };
 
   const tokens = opts.maxTokens ?? 3000;
-  let r = await attempt(!!opts.search, tokens);
-  // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
-  // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
-  if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(false, Math.min(tokens * 2, 8000));
-  return r;
+  // Rotation des clés : si une clé a épuisé son quota, la suivante prend le relais.
+  for (const key of keys) {
+    let r = await attempt(key, !!opts.search, tokens);
+    // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
+    // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
+    if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(key, false, Math.min(tokens * 2, 8000));
+    if (!("error" in r)) return r;
+    // Seul le quota justifie d'essayer une autre clé ; les autres erreurs ne dépendent pas de la clé
+    if (r.error !== "quota") return r;
+  }
+  return { error: "quota", detail: "toutes les clés ont atteint leur quota du jour" };
 }
 
 const HITS = new Map<string, number[]>();
@@ -85,6 +92,7 @@ export const summarizeReviews = createServerFn({ method: "POST" })
     if (hit && Date.now() - hit.at < 24 * 3600_000) return { ok: true as const, text: hit.text, sources: hit.sources, searched: hit.searched };
     if (limited(context.userId, 15)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
+      feature: "reviews",
       search: true,
       maxTokens: 6000,
       system: "Tu rédiges des synthèses de critiques, neutres, factuelles et sans spoiler, en français. N'invente aucun chiffre ni citation.",
@@ -103,6 +111,7 @@ export const recognizePoster = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (limited(context.userId, 10)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
+      feature: "vision",
       json: true,
       maxTokens: 1500,
       system: "Tu identifies des films, séries et animés à partir de leur affiche. Réponds uniquement en JSON. N'invente pas : si tu n'es pas sûr, mets title à null.",
