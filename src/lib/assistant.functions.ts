@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { geminiKeys } from "@/lib/gemini-keys";
+import { geminiKeys, logKeyUsage } from "@/lib/gemini-keys";
 
 const Msg = z.object({ role: z.enum(["user", "assistant"]), text: z.string().min(1).max(1500) });
 const Input = z.object({
@@ -68,12 +68,14 @@ export const askAssistant = createServerFn({ method: "POST" })
       });
     // Rotation des clés : si une clé a épuisé son quota (429), la suivante prend le relais.
     let res: Response | null = null;
-    for (const key of keys) {
+    for (const { name, key } of keys) {
       try {
         res = await call(key, true);
         // Quota gratuit de la recherche Google épuisé : on répond quand même, sans recherche
         if (res.status === 429) res = await call(key, false);
+        void logKeyUsage(name, res.ok ? "ok" : res.status === 429 ? "quota" : "error");
       } catch {
+        void logKeyUsage(name, "error");
         return { ok: false as const, error: "upstream" as const };
       }
       if (res.status !== 429) break; // succès ou erreur indépendante de la clé : on s'arrête là
