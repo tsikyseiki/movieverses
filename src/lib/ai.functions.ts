@@ -92,6 +92,7 @@ export const summarizeReviews = createServerFn({ method: "POST" })
     if (hit && Date.now() - hit.at < 24 * 3600_000) return { ok: true as const, text: hit.text, sources: hit.sources, searched: hit.searched };
     if (limited(context.userId, 15)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
+      feature: "reviews",
       search: true,
       maxTokens: 6000,
       system: "Tu rédiges des synthèses de critiques, neutres, factuelles et sans spoiler, en français. N'invente aucun chiffre ni citation.",
@@ -110,6 +111,7 @@ export const recognizePoster = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (limited(context.userId, 10)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
+      feature: "vision",
       json: true,
       maxTokens: 1500,
       system: "Tu identifies des films, séries et animés à partir de leur affiche. Réponds uniquement en JSON. N'invente pas : si tu n'es pas sûr, mets title à null.",
