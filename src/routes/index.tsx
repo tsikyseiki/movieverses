@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { ArrowDown, ArrowRight, Clapperboard, Eye, Film, MessagesSquare, Play, Sparkles, Tv } from "lucide-react";
+import { ArrowDown, ArrowRight, CircleHelp, Clapperboard, Eye, Film, MessagesSquare, MonitorPlay, Play, Sparkles, Trophy, Tv } from "lucide-react";
 import { fetchFeatured } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -46,16 +46,23 @@ function Hero() {
             Movie<span className="text-primary">Verse</span>
           </h1>
           <p className="animate-rise mt-6 max-w-2xl text-lg leading-relaxed text-foreground/80 md:text-xl">
-            Découvrez films, animés manga et créations occidentales dans un catalogue vivant, enrichi en temps réel.
+            Découvrez films, séries, animés manga et créations occidentales dans un catalogue vivant, enrichi en temps réel.
           </p>
-          <div className="animate-rise mt-8 flex flex-wrap items-center gap-4">
-            <Button asChild size="lg" className="h-12 rounded-full px-7 text-base shadow-lg shadow-primary/30">
-              <a href="#catalogues"><Play className="fill-current" /> Explorer les catalogues</a>
+          {/* Trois grands boutons : « Explorer » ouvre directement les catalogues ; Sports et Aide ont chacun leur bouton */}
+          <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <Button asChild size="lg" className="h-12 w-full rounded-full px-7 text-base shadow-lg shadow-primary/30 sm:w-auto">
+              <Link to="/films"><Play className="fill-current" /> Explorer les catalogues</Link>
             </Button>
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-primary" /> Données actualisées en direct
-            </span>
+            <Button asChild size="lg" variant="secondary" className="h-12 w-full rounded-full px-7 text-base sm:w-auto">
+              <Link to="/sports"><Trophy /> Sports en direct</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="h-12 w-full rounded-full border-foreground/30 bg-background/20 px-7 text-base backdrop-blur sm:w-auto">
+              <Link to="/aide"><CircleHelp /> Aide</Link>
+            </Button>
           </div>
+          <span className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-primary" /> Données actualisées en direct
+          </span>
         </div>
       </div>
       <a href="#a-propos" aria-label="Découvrir MovieVerse" className="absolute bottom-5 left-1/2 -translate-x-1/2 text-foreground/60 transition hover:text-foreground">
@@ -69,6 +76,7 @@ const universes = [
   { kind: "film" as const, title: "Films", copy: "Du grand spectacle aux histoires intimes, explorez le cinéma par genre.", to: "/films" as const, icon: Film },
   { kind: "manga" as const, title: "Animé Manga", copy: "Shonen, seinen, isekai et bien plus, directement depuis le Japon.", to: "/manga" as const, icon: Clapperboard },
   { kind: "occidental" as const, title: "Animé Occidental", copy: "Cartoons, super-héros et séries animées pour tous les univers.", to: "/occidental" as const, icon: Tv },
+  { kind: "serie" as const, title: "Séries", copy: "Drames, comédies, thrillers et science-fiction : les séries du moment.", to: "/series" as const, icon: MonitorPlay },
 ];
 
 function About() {
@@ -88,12 +96,12 @@ function About() {
       <section id="catalogues" className="mx-auto max-w-[1500px] px-4 py-20 md:px-8 md:py-28">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase text-primary">Trois univers</p>
+            <p className="text-sm font-semibold uppercase text-primary">Quatre univers</p>
             <h2 className="mt-3 text-3xl font-bold md:text-5xl">Choisissez votre catalogue</h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">Chaque univers possède ses propres genres, tendances et recommandations.</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {universes.map(({ title, copy, to, icon: Icon }) => (
             <Link key={to} to={to} className="group relative min-h-72 overflow-hidden rounded-lg border border-border bg-card p-7 transition duration-500 hover:-translate-y-1 hover:border-primary/60">
               <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-primary/15 to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />

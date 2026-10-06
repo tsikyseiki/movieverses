@@ -20,7 +20,7 @@ import { readableOn, rgbCss, useDominantColor } from "@/lib/color";
 import { predictRating } from "@/lib/insights";
 import { announceWatching } from "@/lib/presence";
 
-const KINDS: Kind[] = ["film", "manga", "occidental"];
+const KINDS: Kind[] = ["film", "manga", "occidental", "serie"];
 
 export const Route = createFileRoute("/titre/$kind/$id")({
   beforeLoad: ({ params }) => {
@@ -200,7 +200,7 @@ function DetailPage() {
         <ReviewForm item={{ kind, item_id: d.id, title: d.title, poster: d.poster ?? null, rating: d.rating ?? null }} myRating={mine} />
         {d.cast.length > 0 && (
           <section>
-            <h2 className="mb-4 text-2xl font-bold">{kind === "film" || kind === "occidental" ? "Casting principal" : "Personnages"}</h2>
+            <h2 className="mb-4 text-2xl font-bold">{kind === "manga" ? "Personnages" : "Casting principal"}</h2>
             <div className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4">
               {d.cast.map((c) => (
                 <div key={c.name + c.role} className="w-28 shrink-0 text-center">

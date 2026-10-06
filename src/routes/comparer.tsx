@@ -23,7 +23,7 @@ export const Route = createFileRoute("/comparer")({
 
 const parse = (v?: string): { kind: Kind; id: string } | null => {
   const [kind, id] = (v ?? "").split(":");
-  return kind && id && ["film", "manga", "occidental"].includes(kind) ? { kind: kind as Kind, id } : null;
+  return kind && id && ["film", "manga", "occidental", "serie"].includes(kind) ? { kind: kind as Kind, id } : null;
 };
 
 function Picker({ onPick }: { onPick: (v: string) => void }) {

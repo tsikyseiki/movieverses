@@ -48,7 +48,7 @@ function Journal() {
         <Card icon={Star} label="Ma note moyenne" value={stats.avgRating != null ? `${stats.avgRating}/10` : "—"} />
       </div>
       <p className="mt-3 text-sm text-muted-foreground">
-        {stats.thisMonth} titre{stats.thisMonth > 1 ? "s" : ""} vu{stats.thisMonth > 1 ? "s" : ""} ce mois-ci · {CATEGORIES.film.label} {stats.byKind.film} · {CATEGORIES.manga.label} {stats.byKind.manga} · {CATEGORIES.occidental.label} {stats.byKind.occidental}
+        {stats.thisMonth} titre{stats.thisMonth > 1 ? "s" : ""} vu{stats.thisMonth > 1 ? "s" : ""} ce mois-ci · {CATEGORIES.film.label} {stats.byKind.film} · {CATEGORIES.manga.label} {stats.byKind.manga} · {CATEGORIES.occidental.label} {stats.byKind.occidental} · {CATEGORIES.serie.label} {stats.byKind.serie}
       </p>
 
       <h2 className="mt-12 text-2xl font-bold">Trophées <span className="text-base font-normal text-muted-foreground">{unlocked}/{list.length}</span></h2>

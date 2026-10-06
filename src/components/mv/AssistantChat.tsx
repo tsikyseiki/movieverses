@@ -9,6 +9,7 @@ type Props = { title: string; kind: Kind; year?: string | undefined; overview: s
 const SUGGESTIONS: Record<Kind, string[]> = {
   film: ["Y aura-t-il une suite ?", "Ça vaut le coup, sans spoiler ?", "Quelles anecdotes de tournage ?", "Quels films similaires ?"],
   manga: ["Quand sort la prochaine saison ?", "Où s'arrête l'anime par rapport au manga ?", "Dans quel ordre le regarder ?", "Ça vaut le coup, sans spoiler ?"],
+  serie: ["Y a-t-il une nouvelle saison prévue ?", "Ça vaut le coup, sans spoiler ?", "C'est pour quel public ?", "Quelles séries similaires ?"],
   occidental: ["Y a-t-il une nouvelle saison prévue ?", "Ça vaut le coup, sans spoiler ?", "C'est pour quel âge ?", "Quelles séries similaires ?"],
 };
 

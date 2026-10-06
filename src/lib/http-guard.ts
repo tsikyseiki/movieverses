@@ -85,5 +85,5 @@ export function checkApi(req: Request, scope: string): { denied: Response | null
 }
 
 export const isSafeId = (s: string) => /^[A-Za-z0-9_-]{1,32}$/.test(s);
-export const KINDS = ["film", "manga", "occidental"] as const;
+export const KINDS = ["film", "manga", "occidental", "serie"] as const;
 export const clampInt = (v: string | null, def: number, min: number, max: number) => Math.min(Math.max(Math.trunc(Number(v ?? def)) || def, min), max);

@@ -25,7 +25,7 @@ const MOODS: { v: Mood; l: string; hint: string; Icon: typeof Laugh }[] = [
   { v: "action", l: "Action", hint: "Adrénaline et aventure", Icon: Zap },
   { v: "reve", l: "Évasion", hint: "Fantastique et science-fiction", Icon: Orbit },
 ];
-const KINDS: Kind[] = ["film", "manga", "occidental"];
+const KINDS: Kind[] = ["film", "manga", "occidental", "serie"];
 
 function Chips<T extends string | boolean>({ value, options, onChange }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void }) {
   return (

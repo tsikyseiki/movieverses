@@ -153,7 +153,7 @@ function RootComponent() {
     if (conn?.saveData || saver) return;
     const run = () => {
       void queryClient.prefetchQuery({ queryKey: ["featured", "fr-FR"], queryFn: () => fetchFeatured("fr-FR"), staleTime: 15 * 60_000 });
-      (["film", "manga", "occidental"] as const).forEach((k) => {
+      (["film", "manga", "occidental", "serie"] as const).forEach((k) => {
         void queryClient.prefetchInfiniteQuery({
           queryKey: ["catalog", k, null, "fr-FR", "", 0, false],
           queryFn: ({ pageParam }) => fetchCatalog(k, null, pageParam, "fr-FR"),

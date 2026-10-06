@@ -24,7 +24,7 @@ function Wrapped() {
   const top = [...genres.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
   const perMonth = Array.from({ length: 12 }, (_, m) => list.filter((w) => new Date(w.at).getMonth() === m).length);
   const busiest = perMonth.indexOf(Math.max(...perMonth));
-  const kinds = (["film", "manga", "occidental"] as const).map((k) => [k, list.filter((w) => w.kind === k).length] as const).sort((a, b) => b[1] - a[1]);
+  const kinds = (["film", "manga", "occidental", "serie"] as const).map((k) => [k, list.filter((w) => w.kind === k).length] as const).sort((a, b) => b[1] - a[1]);
   const best = [...list].filter((w) => ratings[`${w.kind}:${w.id}`] != null).sort((a, b) => ratings[`${b.kind}:${b.id}`]! - ratings[`${a.kind}:${a.id}`]!)[0];
   const max = Math.max(1, ...perMonth);
 

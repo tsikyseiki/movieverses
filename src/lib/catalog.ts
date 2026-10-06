@@ -1,6 +1,6 @@
 import { tmdbFetch } from "./tmdb.functions";
 
-export type Kind = "film" | "manga" | "occidental";
+export type Kind = "film" | "manga" | "occidental" | "serie";
 export type Item = {
   kind: Kind;
   id: string;
@@ -17,6 +17,7 @@ export const CATEGORIES: Record<Kind, { label: string; path: string; tagline: st
   film: { label: "Films", path: "/films", tagline: "Le cinéma du monde entier" },
   manga: { label: "Animé Manga", path: "/manga", tagline: "L'animation japonaise" },
   occidental: { label: "Animé Occidental", path: "/occidental", tagline: "Dessins animés et séries animées" },
+  serie: { label: "Séries", path: "/series", tagline: "Les séries du moment" },
 };
 
 type TmdbGenre = { slug: string; label: string; genre?: number; keyword?: number };
@@ -57,7 +58,20 @@ export const MANGA_GENRES: AniGenre[] = [
   { slug: "fantastique", label: "Fantastique", genre: "Fantasy" },
   { slug: "comedie", label: "Comédie", genre: "Comedy" },
 ];
-export const genresFor = (k: Kind) => (k === "film" ? FILM_GENRES : k === "manga" ? MANGA_GENRES : WEST_GENRES);
+export const SERIES_GENRES: TmdbGenre[] = [
+  { slug: "action-aventure", label: "Action & Aventure", genre: 10759 },
+  { slug: "comedie", label: "Comédie", genre: 35 },
+  { slug: "drame", label: "Drame", genre: 18 },
+  { slug: "crime", label: "Crime", genre: 80 },
+  { slug: "mystere", label: "Mystère", genre: 9648 },
+  { slug: "science-fiction", label: "Science-fiction & Fantastique", genre: 10765 },
+  { slug: "famille", label: "Famille", genre: 10751 },
+  { slug: "guerre-politique", label: "Guerre & Politique", genre: 10768 },
+  { slug: "western", label: "Western", genre: 37 },
+  { slug: "documentaire", label: "Documentaire", genre: 99 },
+  { slug: "telerealite", label: "Téléréalité", genre: 10764 },
+];
+export const genresFor = (k: Kind) => (k === "film" ? FILM_GENRES : k === "manga" ? MANGA_GENRES : k === "serie" ? SERIES_GENRES : WEST_GENRES);
 
 const IMG = "https://image.tmdb.org/t/p/";
 const WEST_ORIGINS = "US|GB|FR|CA|BE|IE|AU|DE|ES|IT";
@@ -161,7 +175,7 @@ export async function fetchCatalog(kind: Kind, genre: string | null, page: numbe
     });
     return { items: d.Page.media.map(mapAni), next: d.Page.pageInfo.hasNextPage ? page + 1 : null };
   }
-  const list = kind === "film" ? FILM_GENRES : WEST_GENRES;
+  const list = kind === "film" ? FILM_GENRES : kind === "serie" ? SERIES_GENRES : WEST_GENRES;
   const g = list.find((x) => x.slug === genre);
   const params: Record<string, string> = {
     page: String(page),
@@ -189,6 +203,16 @@ export async function fetchCatalog(kind: Kind, genre: string | null, page: numbe
     return { items: d.results.map((r: any) => mapTmdb("film", r)), next: page < Math.min(d.total_pages, 500) ? page + 1 : null };
   }
   if (f.year) params["first_air_date_year"] = f.year;
+  if (kind === "serie") {
+    // Séries télévisées : tout sauf l'animation (qui reste dans « Animé occidental » et « Animé manga »)
+    if (g?.genre) params["with_genres"] = String(g.genre);
+    params["without_genres"] = f.family ? "16,10762,80,9648,10764" : "16,10762";
+    const ds = await tmdb("/discover/tv", params);
+    return {
+      items: ds.results.filter((r: any) => !r.genre_ids?.includes(16)).map((r: any) => mapTmdb("serie", r)),
+      next: page < Math.min(ds.total_pages, 500) ? page + 1 : null,
+    };
+  }
   params["with_genres"] = g?.genre ? `16,${g.genre}` : "16";
   if (g?.keyword) params["with_keywords"] = String(g.keyword);
   params["with_origin_country"] = WEST_ORIGINS;
@@ -284,7 +308,7 @@ export async function fetchDetail(kind: Kind, id: string, lang: string): Promise
   avail.forEach((p: any) => uniq.set(p.provider_name, p));
   const recs = [...(d.recommendations?.results ?? []), ...(d.similar?.results ?? [])];
   const strictRecs = recs.filter((r: any) =>
-    kind === "film" ? !r.genre_ids?.includes(16) || d.genres?.some((g: any) => g.id === 16) : r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP"),
+    kind === "film" ? !r.genre_ids?.includes(16) || d.genres?.some((g: any) => g.id === 16) : kind === "serie" ? !r.genre_ids?.includes(16) || d.genres?.some((g: any) => g.id === 16) : r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP"),
   );
   const seen = new Set<number>();
   return {
@@ -343,7 +367,7 @@ export async function fetchConnections(kind: Kind, id: string, lang: string): Pr
   const d = await tmdb(`/${t}/${id}`, { language: lang, append_to_response: "credits,recommendations" });
   const isAnim = d.genres?.some((g: any) => g.id === 16);
   const okKind = (r: any) =>
-    kind === "film" ? !r.genre_ids?.includes(16) || isAnim : r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP");
+    kind === "film" || kind === "serie" ? !r.genre_ids?.includes(16) || isAnim : r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP");
   const tasks: Promise<void>[] = [];
 
   const director = kind === "film" ? d.credits?.crew?.find((c: any) => c.job === "Director") : d.created_by?.[0];
@@ -407,6 +431,7 @@ export async function fetchPerson(id: string, lang: string): Promise<PersonDetai
     let kind: Kind | null = null;
     if (x.media_type === "movie" && !x.genre_ids?.includes(16)) kind = "film";
     else if (x.media_type === "tv" && x.genre_ids?.includes(16) && !(x.origin_country ?? []).includes("JP")) kind = "occidental";
+    else if (x.media_type === "tv" && !x.genre_ids?.includes(16)) kind = "serie";
     if (!kind) continue;
     const k = `${kind}:${x.id}`;
     if (seen.has(k)) continue;
@@ -439,6 +464,12 @@ export async function fetchTonight(t: Tonight, lang: string): Promise<Item[]> {
     return (d.results ?? []).map((x: any) => mapTmdb("film", x));
   }
   const g = { rire: "35", frissons: "9648", emotion: "18", action: "10759", reve: "10765" }[t.mood];
+  if (t.kind === "serie") {
+    params["with_genres"] = g;
+    params["without_genres"] = t.family ? "16,10762,80,9648" : "16,10762";
+    const ds = await tmdb("/discover/tv", params);
+    return (ds.results ?? []).filter((x: any) => !x.genre_ids?.includes(16)).map((x: any) => mapTmdb("serie", x));
+  }
   params["with_genres"] = `16,${g}`;
   if (t.family) params["without_genres"] = "10768";
   const d = await tmdb("/discover/tv", params);
@@ -496,7 +527,10 @@ export async function searchAll(q: string, lang: string): Promise<Item[]> {
   if (m.status === "fulfilled") out.push(...m.value.results.filter((r: any) => !r.genre_ids?.includes(16)).slice(0, 5).map((r: any) => mapTmdb("film", r)));
   if (ani.status === "fulfilled") out.push(...ani.value.Page.media.map(mapAni));
   if (tv.status === "fulfilled")
-    out.push(...tv.value.results.filter((r: any) => r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP")).slice(0, 4).map((r: any) => mapTmdb("occidental", r)));
+    {
+      out.push(...tv.value.results.filter((r: any) => r.genre_ids?.includes(16) && !(r.origin_country ?? []).includes("JP")).slice(0, 4).map((r: any) => mapTmdb("occidental", r)));
+      out.push(...tv.value.results.filter((r: any) => !r.genre_ids?.includes(16)).slice(0, 4).map((r: any) => mapTmdb("serie", r)));
+    }
   return out;
 }
 

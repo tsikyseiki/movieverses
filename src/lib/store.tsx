@@ -26,7 +26,7 @@ const DEFAULT: Settings = {
   reduceMotion: false,
   subtitles: true,
   lang: "fr-FR",
-  categories: { film: true, manga: true, occidental: true },
+  categories: { film: true, manga: true, occidental: true, serie: true },
   cardSize: "normal",
   autoplayHero: true,
 };
@@ -87,7 +87,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [settings.theme]);
 
   useEffect(() => {
-    setS({ ...DEFAULT, ...load("settings", {}), lang: "fr-FR" });
+    const saved = load("settings", {}) as Partial<Settings>;
+    setS({ ...DEFAULT, ...saved, categories: { ...DEFAULT.categories, ...(saved.categories ?? {}) }, lang: "fr-FR" });
     setFav(load("favorites", []));
     setHist(load("history", []));
     setRatings(load("ratings", {}));

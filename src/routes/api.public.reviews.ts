@@ -16,7 +16,7 @@ export const Route = createFileRoute("/api/public/reviews")({
         const itemId = u.searchParams.get("item_id");
         const limit = clampInt(u.searchParams.get("limit"), 20, 1, 100);
         const offset = clampInt(u.searchParams.get("offset"), 0, 0, 5000);
-        if (kind && !(KINDS as readonly string[]).includes(kind)) return apiJson(request, { error: "kind invalide (film, manga, occidental)" }, { status: 400, rl });
+        if (kind && !(KINDS as readonly string[]).includes(kind)) return apiJson(request, { error: "kind invalide (film, manga, occidental, serie)" }, { status: 400, rl });
         if (itemId && !isSafeId(itemId)) return apiJson(request, { error: "item_id invalide" }, { status: 400, rl });
         let q = supabase
           .from("posts")

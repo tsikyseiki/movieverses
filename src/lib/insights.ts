@@ -62,7 +62,7 @@ export function computeStats(watched: WatchEntry[], ratings: Record<string, numb
   const top = [...genres.entries()].sort((a, b) => b[1] - a[1])[0];
   const now = new Date();
   const vals = Object.values(ratings);
-  const byKind: Record<Kind, number> = { film: 0, manga: 0, occidental: 0 };
+  const byKind: Record<Kind, number> = { film: 0, manga: 0, occidental: 0, serie: 0 };
   for (const w of watched) byKind[w.kind]++;
   return {
     total: watched.length,
@@ -88,7 +88,7 @@ export function trophies(s: Stats, ratingsCount: number, favoritesCount: number)
     { id: "g5", icon: "compass", title: "Curieux", desc: "Explorer 5 genres", value: s.genreCount, goal: 5 },
     { id: "g10", icon: "map", title: "Explorateur", desc: "Explorer 10 genres", value: s.genreCount, goal: 10 },
     { id: "g15", icon: "globe", title: "Globe-trotteur", desc: "Explorer 15 genres", value: s.genreCount, goal: 15 },
-    { id: "k3", icon: "orbit", title: "Multi-univers", desc: "Voir un film, un animé manga et un animé occidental", value: s.kindCount, goal: 3 },
+    { id: "k3", icon: "orbit", title: "Multi-univers", desc: "Voir un film, un animé manga, un animé occidental et une série", value: s.kindCount, goal: 4 },
     { id: "r10", icon: "star", title: "Critique", desc: "Noter 10 titres", value: ratingsCount, goal: 10 },
     { id: "r50", icon: "medal", title: "Juré", desc: "Noter 50 titres", value: ratingsCount, goal: 50 },
     { id: "f10", icon: "heart", title: "Collectionneur", desc: "10 titres dans Ma liste", value: favoritesCount, goal: 10 },

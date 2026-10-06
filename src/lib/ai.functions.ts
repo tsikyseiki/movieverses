@@ -1,72 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { geminiKeys, logKeyUsage, type GeminiFeature } from "@/lib/gemini-keys";
+import { callGemini, currentThinkingMode, defaultModel, KEY_NAMES, probeGemini, type Purpose } from "@/lib/gemini-core";
 
-// ---- Appel Gemini (partagé par les deux fonctions ci-dessous) ----
+// ---- Appel Gemini : noyau partagé (réflexion réduite, repli sans recherche, mesures) ----
 type GeminiPart = { text?: string; inlineData?: { mimeType: string; data: string } };
-type GeminiOk = { text: string; sources: { title: string; url: string }[]; searched: boolean };
-type GeminiFail = { error: "missing_key" | "quota" | "upstream" | "empty"; detail?: string };
-
-async function gemini(opts: { feature: GeminiFeature; system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }): Promise<GeminiOk | GeminiFail> {
-  const keys = geminiKeys(opts.feature);
-  if (!keys.length) return { error: "missing_key" };
-  const model = process.env["GEMINI_MODEL"] || "gemini-3.5-flash";
-
-  const attempt = async (key: string, search: boolean, tokens: number): Promise<GeminiOk | GeminiFail> => {
-    let res: Response;
-    try {
-      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-goog-api-key": key },
-        body: JSON.stringify({
-          ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
-          contents: [{ role: "user", parts: opts.parts }],
-          ...(search ? { tools: [{ google_search: {} }] } : {}),
-          generationConfig: { temperature: opts.json ? 0.1 : 0.4, maxOutputTokens: tokens, ...(opts.json ? { responseMimeType: "application/json" } : {}) },
-        }),
-        signal: AbortSignal.timeout(55_000),
-      });
-    } catch {
-      return { error: "upstream", detail: "délai dépassé ou réseau indisponible" };
-    }
-    if (!res.ok) {
-      let detail = `HTTP ${res.status}`;
-      try {
-        const e = (await res.json()) as { error?: { message?: string } };
-        if (e.error?.message) detail += ` : ${e.error.message.slice(0, 180)}`;
-      } catch { /* ignoré */ }
-      return { error: res.status === 429 ? "quota" : "upstream", detail };
-    }
-    const j = (await res.json()) as {
-      candidates?: { finishReason?: string; content?: { parts?: { text?: string }[] }; groundingMetadata?: { groundingChunks?: { web?: { uri?: string; title?: string } }[] } }[];
-    };
-    const c = j.candidates?.[0];
-    const text = (c?.content?.parts ?? []).map((p) => p.text ?? "").join("").trim();
-    if (!text) return { error: "empty", detail: `réponse vide (${c?.finishReason ?? "raison inconnue"})` };
-    const seen = new Set<string>();
-    const sources = (c?.groundingMetadata?.groundingChunks ?? [])
-      .map((x) => x.web)
-      .filter((w): w is { uri: string; title?: string } => !!w?.uri && /^https:\/\//.test(w.uri))
-      .filter((w) => !seen.has(w.uri) && seen.add(w.uri))
-      .slice(0, 4)
-      .map((w) => ({ title: w.title ?? "Source", url: w.uri }));
-    return { text, sources, searched: search };
-  };
-
-  const tokens = opts.maxTokens ?? 3000;
-  // Rotation des clés : si une clé a épuisé son quota, la suivante prend le relais.
-  for (const { name, key } of keys) {
-    let r = await attempt(key, !!opts.search, tokens);
-    // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
-    // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
-    if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(key, false, Math.min(tokens * 2, 8000));
-    void logKeyUsage(name, !("error" in r) ? "ok" : r.error === "quota" ? "quota" : "error");
-    if (!("error" in r)) return r;
-    // Seul le quota justifie d'essayer une autre clé ; les autres erreurs ne dépendent pas de la clé
-    if (r.error !== "quota") return r;
-  }
-  return { error: "quota", detail: "toutes les clés ont atteint leur quota du jour" };
+async function gemini(opts: { purpose: Purpose; system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }) {
+  return callGemini({ purpose: opts.purpose, system: opts.system, contents: [{ role: "user", parts: opts.parts }], search: opts.search, json: opts.json, maxTokens: opts.maxTokens });
 }
 
 const HITS = new Map<string, number[]>();
@@ -82,18 +22,18 @@ function limited(uid: string, max: number) {
 
 // ---- 1) Résumé neutre des critiques ----
 const CACHE = new Map<string, { at: number; text: string; sources: { title: string; url: string }[]; searched: boolean }>();
-const KIND = { film: "film", manga: "animé japonais", occidental: "série d'animation occidentale" } as const;
+const KIND = { film: "film", manga: "animé japonais", occidental: "série d'animation occidentale", serie: "série télévisée" } as const;
 
 export const summarizeReviews = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ title: z.string().min(1).max(150), kind: z.enum(["film", "manga", "occidental"]), year: z.string().max(10).optional() }).parse(d))
+  .inputValidator((d) => z.object({ title: z.string().min(1).max(150), kind: z.enum(["film", "manga", "occidental", "serie"]), year: z.string().max(10).optional() }).parse(d))
   .handler(async ({ data, context }) => {
     const ck = `${data.kind}|${data.title}|${data.year ?? ""}`;
     const hit = CACHE.get(ck);
     if (hit && Date.now() - hit.at < 24 * 3600_000) return { ok: true as const, text: hit.text, sources: hit.sources, searched: hit.searched };
     if (limited(context.userId, 15)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
-      feature: "reviews",
+      purpose: "reviews",
       search: true,
       maxTokens: 6000,
       system: "Tu rédiges des synthèses de critiques, neutres, factuelles et sans spoiler, en français. N'invente aucun chiffre ni citation.",
@@ -112,7 +52,7 @@ export const recognizePoster = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (limited(context.userId, 10)) return { ok: false as const, error: "rate_limited" as const };
     const r = await gemini({
-      feature: "vision",
+      purpose: "vision",
       json: true,
       maxTokens: 1500,
       system: "Tu identifies des films, séries et animés à partir de leur affiche. Réponds uniquement en JSON. N'invente pas : si tu n'es pas sûr, mets title à null.",
@@ -128,4 +68,18 @@ export const recognizePoster = createServerFn({ method: "POST" })
     } catch {
       return { ok: false as const, error: "empty" as const };
     }
+  });
+
+// ---- 3) Diagnostic de l'IA (administrateur) : temps de réponse de chaque modèle avec la clé enregistrée ----
+export const aiDiagnostics = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) return { ok: false as const, error: "forbidden" as const };
+    if (!KEY_NAMES.some((n) => process.env[n]?.trim())) return { ok: false as const, error: "missing_key" as const };
+    const models = [...new Set([defaultModel(), "gemini-3.5-flash", "gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3-flash-preview"])];
+    const rows = await Promise.all(models.map(async (model) => ({ model, plain: await probeGemini(model, false), search: await probeGemini(model, true) })));
+    // Chaque clé configurée est testée (jamais affichée : seulement son nom)
+    const keys = await Promise.all(KEY_NAMES.map(async (name) => (process.env[name]?.trim() ? { name, configured: true as const, ...(await probeGemini(defaultModel(), false, name)) } : { name, configured: false as const })));
+    return { ok: true as const, current: defaultModel(), thinking: currentThinkingMode(), rows, keys };
   });

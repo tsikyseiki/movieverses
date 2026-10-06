@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/public/ratings")({
         const kind = u.searchParams.get("kind");
         const itemId = u.searchParams.get("item_id");
         const limit = clampInt(u.searchParams.get("limit"), 50, 1, 100);
-        if (kind && !(KINDS as readonly string[]).includes(kind)) return apiJson(request, { error: "kind invalide (film, manga, occidental)" }, { status: 400, rl });
+        if (kind && !(KINDS as readonly string[]).includes(kind)) return apiJson(request, { error: "kind invalide (film, manga, occidental, serie)" }, { status: 400, rl });
         if (itemId && !isSafeId(itemId)) return apiJson(request, { error: "item_id invalide" }, { status: 400, rl });
         let q = supabase.from("posts").select("kind,item_id,title,user_rating").not("user_rating", "is", null).limit(5000);
         if (kind) q = q.eq("kind", kind);

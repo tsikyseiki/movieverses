@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, CircleHelp, Clapperboard, Code2, Database, FileText, Film, Home, Info, Landmark, ListPlus, LogOut, Mail, Medal,
-  Menu, MessagesSquare, Moon, NotebookPen, ScanSearch, Scale, Search, ShieldAlert, ShieldCheck, SlidersHorizontal, Sparkles, Sun, Trophy, Tv, UserRound, Users, Heart,
+  Menu, MessagesSquare, MonitorPlay, Moon, NotebookPen, ScanSearch, Scale, Search, ShieldAlert, ShieldCheck, SlidersHorizontal, Sparkles, Sun, Trophy, Tv, UserRound, Users, Heart,
   type LucideIcon,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -21,6 +21,7 @@ const SECTIONS: Section[] = [
     { to: "/films", label: "Films", icon: Film },
     { to: "/manga", label: "Animés manga", icon: Clapperboard },
     { to: "/occidental", label: "Animés occidentaux", icon: Tv },
+    { to: "/series", label: "Séries", icon: MonitorPlay },
     { to: "/sports", label: "Sports en direct", icon: Trophy },
     { to: "/classiques", label: "Classiques du domaine public", hint: "Films complets gratuits", icon: Landmark },
   ] },

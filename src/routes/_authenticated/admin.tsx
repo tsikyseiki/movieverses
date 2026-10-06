@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/lib/auth";
 import { fetchVisits } from "@/lib/community";
 import { cloud } from "@/lib/cloud";
+import { aiDiagnostics } from "@/lib/ai.functions";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -131,6 +132,81 @@ function FeedbackCard() {
   );
 }
 
+type DiagResult = Awaited<ReturnType<typeof aiDiagnostics>>;
+
+function AiDiagnosticCard() {
+  const [busy, setBusy] = useState(false);
+  const [res, setRes] = useState<DiagResult | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [usage, setUsage] = useState<{ key_name: string; ok_count: number; quota_count: number; error_count: number }[]>([]);
+  const run = async () => {
+    setBusy(true);
+    setFailed(false);
+    try {
+      setRes(await aiDiagnostics());
+      const day = new Date().toISOString().slice(0, 10);
+      const u = await cloud.from("gemini_key_usage").select("key_name,ok_count,quota_count,error_count").eq("day", day).order("key_name");
+      setUsage((u.data ?? []) as typeof usage);
+    } catch { setFailed(true); } finally { setBusy(false); }
+  };
+  const cell = (r: { ok: boolean; ms: number; status: string }) => (
+    <span className={r.ok ? "text-green-500" : "text-destructive"}>{r.ok ? `${(r.ms / 1000).toFixed(1)} s` : r.status.slice(0, 60)}</span>
+  );
+  const fastest = res && res.ok ? [...res.rows].filter((r) => r.plain.ok).sort((a, b) => a.plain.ms - b.plain.ms)[0] : null;
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+      <h2 className="font-semibold">Diagnostic de l'IA (Gemini)</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Teste avec les clés enregistrées dans les secrets : temps de réponse de chaque modèle, avec et sans recherche Google. Aucune clé n'est affichée.</p>
+      <button onClick={run} disabled={busy} className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+        {busy ? "Test en cours (jusqu'à 40 s)…" : "Lancer le diagnostic"}
+      </button>
+      {failed && <p className="mt-3 text-sm text-destructive">Le diagnostic n'a pas pu s'exécuter. Réessayez.</p>}
+      {res && !res.ok && <p className="mt-3 text-sm text-destructive">{res.error === "forbidden" ? "Réservé à l'administrateur." : "Aucune clé Gemini n'est enregistrée dans les secrets."}</p>}
+      {res && res.ok && (
+        <div className="mt-4 space-y-4 text-sm">
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Clés détectées</p>
+            {res.keys.map((k) => (
+              <div key={k.name} className="flex justify-between gap-3 border-b border-border py-1.5 last:border-0">
+                <code className="text-xs">{k.name}</code>
+                {k.configured ? cell(k) : <span className="text-muted-foreground">non configurée</span>}
+              </div>
+            ))}
+          </div>
+          {usage.length > 0 && (
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Utilisation aujourd'hui (UTC)</p>
+              {usage.map((u) => (
+                <div key={u.key_name} className="flex justify-between gap-3 border-b border-border py-1.5 text-xs last:border-0">
+                  <code>{u.key_name}</code>
+                  <span><span className="text-green-500">{u.ok_count} ok</span> · <span className={u.quota_count ? "text-destructive" : ""}>{u.quota_count} quota</span> · {u.error_count} erreur</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="overflow-x-auto">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Modèles (modèle actuel : {res.current})</p>
+            <table className="w-full min-w-[420px] text-left">
+              <thead className="text-xs text-muted-foreground"><tr><th className="py-1 pr-3 font-medium">Modèle</th><th className="py-1 pr-3 font-medium">Sans recherche</th><th className="py-1 font-medium">Avec recherche</th></tr></thead>
+              <tbody>
+                {res.rows.map((r) => (
+                  <tr key={r.model} className="border-t border-border">
+                    <td className="py-1.5 pr-3 font-mono text-xs">{r.model}</td>
+                    <td className="py-1.5 pr-3">{cell(r.plain)}</td>
+                    <td className="py-1.5">{cell(r.search)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-muted-foreground">Réflexion du modèle : {res.thinking === "level" ? "niveau bas (rapide)" : res.thinking === "budget" ? "budget zéro (rapide)" : "réglage non accepté par le modèle"}.</p>
+          {fastest && fastest.model !== res.current && <p className="rounded-xl bg-primary/10 p-3 text-xs">Le plus rapide ici : <strong>{fastest.model}</strong>. Pour l'utiliser : Cloud, Secrets, secret <code>GEMINI_MODEL</code> = {fastest.model}.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Admin() {
   const { isAdmin, loading } = useAuthUser();
   const { data = [] } = useQuery({
@@ -198,6 +274,7 @@ function Admin() {
       >
         <Download className="h-4 w-4" /> Exporter les statistiques (CSV anonymisé)
       </button>
+      <AiDiagnosticCard />
       <RolesCard />
       <FeedbackCard />
     </div>

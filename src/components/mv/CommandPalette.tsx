@@ -6,7 +6,7 @@ import { CATEGORIES, searchAll } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 
 const PAGES = [
-  ["/", "Accueil"], ["/films", "Films"], ["/manga", "Animés manga"], ["/occidental", "Animés occidentaux"], ["/sports", "Sports en direct"],
+  ["/", "Accueil"], ["/films", "Films"], ["/manga", "Animés manga"], ["/occidental", "Animés occidentaux"], ["/series", "Séries"], ["/sports", "Sports en direct"],
   ["/recherche", "Recherche avancée"], ["/ce-soir", "Que regarder ce soir ?"], ["/calendrier", "Calendrier des sorties"], ["/comparer", "Comparer deux titres"],
   ["/reconnaitre", "Reconnaître une affiche"], ["/classiques", "Classiques du domaine public"], ["/ma-liste", "Ma liste"], ["/listes", "Mes listes"],
   ["/partage", "Listes partagées"], ["/journal", "Journal & trophées"], ["/bilan", "Mon bilan de l'année"], ["/communaute", "Avis & discussions"],

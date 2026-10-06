@@ -46,18 +46,35 @@ export function Catalog({ kind, genre }: { kind: Kind; genre: string | null }) {
   const pill = "shrink-0 rounded-full border px-4 py-1.5 text-sm transition";
   const filtered = !!year || minRating > 0;
   return (
-    <div className="mx-auto max-w-[1500px] px-4 pb-20 pt-36 md:px-8 lg:pt-28">
+    <div className="mx-auto max-w-[1500px] px-4 pb-20 pt-28 md:px-8 lg:pt-24">
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">{CATEGORIES[kind].tagline}</p>
-      <h1 className="mt-2 text-4xl font-extrabold md:text-6xl">{CATEGORIES[kind].label}</h1>
-      <div className="no-scrollbar -mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-2">
-        <Link to={CATEGORIES[kind].path as "/films"} search={{ genre: undefined }} className={cn(pill, !valid ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-foreground/40")}>
-          Tout
-        </Link>
-        {genres.map((g) => (
-          <Link key={g.slug} to={CATEGORIES[kind].path as "/films"} search={{ genre: g.slug }} className={cn(pill, valid === g.slug ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-foreground/40")}>
-            {g.label}
+      <h1 className="mt-1 text-3xl font-extrabold md:text-5xl">{CATEGORIES[kind].label}</h1>
+
+      {/* Barre fixe : catégories + genres restent visibles en défilant, sous l'en-tête */}
+      <div className="sticky z-30 -mx-4 mt-4 border-b border-border bg-background/95 px-4 backdrop-blur-xl md:-mx-8 md:px-8" style={{ top: "var(--mv-header-h, 6.5rem)" }}>
+        <nav aria-label="Catégories" className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1 pt-2">
+          {(Object.keys(CATEGORIES) as Kind[]).map((k) => (
+            <Link
+              key={k}
+              to={CATEGORIES[k].path as "/films"}
+              search={{ genre: undefined }}
+              aria-current={k === kind ? "page" : undefined}
+              className={cn("shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition", k === kind ? "bg-primary text-primary-foreground shadow shadow-primary/30" : "bg-muted/60 text-muted-foreground hover:text-foreground")}
+            >
+              {CATEGORIES[k].label}
+            </Link>
+          ))}
+        </nav>
+        <div aria-label="Genres" className="no-scrollbar flex gap-1.5 overflow-x-auto pb-2 pt-1">
+          <Link to={CATEGORIES[kind].path as "/films"} search={{ genre: undefined }} className={cn(pill, "px-3 py-1 text-xs", !valid ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground")}>
+            Tout
           </Link>
-        ))}
+          {genres.map((g) => (
+            <Link key={g.slug} to={CATEGORIES[kind].path as "/films"} search={{ genre: g.slug }} className={cn(pill, "px-3 py-1 text-xs", valid === g.slug ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground")}>
+              {g.label}
+            </Link>
+          ))}
+        </div>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select aria-label="Année" className={SELECT} value={year} onChange={(e) => setYear(e.target.value)}>
