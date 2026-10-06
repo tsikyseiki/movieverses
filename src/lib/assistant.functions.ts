@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { geminiKeys } from "@/lib/gemini-keys";
 
 const Msg = z.object({ role: z.enum(["user", "assistant"]), text: z.string().min(1).max(1500) });
 const Input = z.object({
