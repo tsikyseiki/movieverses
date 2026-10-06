@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { geminiKeys, type GeminiFeature } from "@/lib/gemini-keys";
+import { geminiKeys, logKeyUsage, type GeminiFeature } from "@/lib/gemini-keys";
 
 // ---- Appel Gemini (partagé par les deux fonctions ci-dessous) ----
 type GeminiPart = { text?: string; inlineData?: { mimeType: string; data: string } };
@@ -56,11 +56,12 @@ async function gemini(opts: { feature: GeminiFeature; system?: string; parts: Ge
 
   const tokens = opts.maxTokens ?? 3000;
   // Rotation des clés : si une clé a épuisé son quota, la suivante prend le relais.
-  for (const key of keys) {
+  for (const { name, key } of keys) {
     let r = await attempt(key, !!opts.search, tokens);
     // Recherche Google indisponible (quota, erreur, délai) ou réponse vide (réflexion trop longue) :
     // on réessaie sans recherche, avec plus de marge, plutôt que d'afficher une erreur
     if ("error" in r && r.error !== "missing_key" && (opts.search || r.error === "empty")) r = await attempt(key, false, Math.min(tokens * 2, 8000));
+    void logKeyUsage(name, !("error" in r) ? "ok" : r.error === "quota" ? "quota" : "error");
     if (!("error" in r)) return r;
     // Seul le quota justifie d'essayer une autre clé ; les autres erreurs ne dépendent pas de la clé
     if (r.error !== "quota") return r;
