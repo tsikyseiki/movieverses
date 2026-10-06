@@ -1,18 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { geminiKeys, type GeminiFeature } from "@/lib/gemini-keys";
 
 // ---- Appel Gemini (partagé par les deux fonctions ci-dessous) ----
 type GeminiPart = { text?: string; inlineData?: { mimeType: string; data: string } };
 type GeminiOk = { text: string; sources: { title: string; url: string }[]; searched: boolean };
 type GeminiFail = { error: "missing_key" | "quota" | "upstream" | "empty"; detail?: string };
 
-async function gemini(opts: { system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }): Promise<GeminiOk | GeminiFail> {
-  const key = process.env["GEMINI_API_KEY"];
-  if (!key) return { error: "missing_key" };
+async function gemini(opts: { feature: GeminiFeature; system?: string; parts: GeminiPart[]; search?: boolean; json?: boolean; maxTokens?: number }): Promise<GeminiOk | GeminiFail> {
+  const keys = geminiKeys(opts.feature);
+  if (!keys.length) return { error: "missing_key" };
   const model = process.env["GEMINI_MODEL"] || "gemini-3.5-flash";
 
-  const attempt = async (search: boolean, tokens: number): Promise<GeminiOk | GeminiFail> => {
+  const attempt = async (key: string, search: boolean, tokens: number): Promise<GeminiOk | GeminiFail> => {
     let res: Response;
     try {
       res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
