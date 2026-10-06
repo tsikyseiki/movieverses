@@ -26,8 +26,8 @@ export const askAssistant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => Input.parse(d))
   .handler(async ({ data, context }) => {
-    const key = process.env["GEMINI_API_KEY"];
-    if (!key) return { ok: false as const, error: "missing_key" as const };
+    const keys = geminiKeys("chat");
+    if (!keys.length) return { ok: false as const, error: "missing_key" as const };
 
     const now = Date.now();
     const recent = (HITS.get(context.userId) ?? []).filter((t) => now - t < WINDOW);
