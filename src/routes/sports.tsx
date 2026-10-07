@@ -148,9 +148,16 @@ function SportsPage() {
   const nation = country ? NATION_EN[country] : undefined;
   const nationalMatch = useMemo(() => nation ? lists.upcoming.concat(lists.live).find((e) => [e.home, e.away].some((n) => n === nation.en || n.startsWith(`${nation.en} `))) : undefined, [nation, lists]);
 
-  const requestLocation = () => {
-    if (!navigator.geolocation) { setLocationState("denied"); return; }
+  const requestLocation = async () => {
     setLocationState("loading");
+    // 1) Pays déduit de la connexion : rapide, et sans demander l'autorisation de position
+    try {
+      const r = await fetch("/api/public/country", { cache: "no-store" });
+      const j = (await r.json()) as { country?: string | null };
+      if (j.country && /^[A-Z]{2}$/.test(j.country) && !["XX", "T1"].includes(j.country)) { setCountry(j.country); setLocationState("ready"); return; }
+    } catch { /* on passe à la position GPS */ }
+    // 2) Sinon, position GPS (le téléphone demande l'autorisation)
+    if (!navigator.geolocation) { setLocationState("denied"); return; }
     navigator.geolocation.getCurrentPosition(({ coords }) => { setCountry(countryFromCoordinates(coords.latitude, coords.longitude)); setLocationState("ready"); }, () => setLocationState("denied"), { timeout: 8_000 });
   };
 
@@ -160,7 +167,7 @@ function SportsPage() {
         <header className="mb-8 border-b border-border pb-8">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div><p className="flex items-center gap-2 text-xs font-bold uppercase text-primary"><Wifi className="h-4 w-4" /> Données réelles · TheSportsDB</p><h1 className="mt-3 text-4xl font-extrabold md:text-6xl">Matchs & Sports <span className="text-primary">Live</span></h1><p className="mt-4 max-w-2xl text-muted-foreground">Résultats, matchs du jour et calendrier de plusieurs sports, affichés à l’heure de votre appareil. Mise à jour automatique chaque minute.</p></div>
-            <Button variant="outline" onClick={requestLocation} disabled={locationState === "loading"}><LocateFixed />{locationState === "loading" ? "Localisation…" : nation ? `Zone : ${nation.fr}` : "Détecter mon pays"}</Button>
+            <Button variant="outline" onClick={requestLocation} disabled={locationState === "loading"}><LocateFixed />{locationState === "loading" ? "Localisation…" : nation ? `Zone : ${nation.fr}` : country && locationState === "ready" ? `Zone : ${country}` : "Détecter mon pays"}</Button>
           </div>
         </header>
         {nationalMatch && nation && <div className="mb-8 flex flex-col gap-4 rounded-lg border border-primary/35 bg-primary/10 p-5 sm:flex-row sm:items-center"><BellRing className="h-6 w-6 shrink-0 text-primary" /><div className="flex-1"><p className="font-bold">{nation.fr} joue bientôt</p><p className="mt-1 text-sm text-muted-foreground">{nationalMatch.home} — {nationalMatch.away} ({nationalMatch.league}), {localDate(nationalMatch.startsAt, true)}.</p></div><Button size="sm" onClick={() => setSelected(nationalMatch)}>Voir</Button></div>}

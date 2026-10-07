@@ -22,7 +22,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "geolocation=(), microphone=(), payment=(), usb=()",
+  "Permissions-Policy": "geolocation=(self), microphone=(), payment=(), usb=()",
   "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
 };
 const securityHeaders = createMiddleware().server(async ({ next }) => {
