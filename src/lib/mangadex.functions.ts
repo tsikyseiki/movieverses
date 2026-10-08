@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { atHome, pageUrl } from "./mangadex-at-home";
 
 const UA = { "User-Agent": "MovieVerse/1.0", accept: "application/json" };
 
@@ -41,9 +42,12 @@ export const findMangaChapters = createServerFn({ method: "GET" })
   });
 
 export const getChapterPages = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d) =>
+    z.object({ id: z.string().uuid(), quality: z.enum(["data", "saver"]).default("saver"), fresh: z.boolean().optional() }).parse(d),
+  )
   .handler(async ({ data }) => {
-    const r = await md(`/at-home/server/${data.id}`);
-    const base = `${r.baseUrl}/data-saver/${r.chapter.hash}`;
-    return { pages: (r.chapter.dataSaver as string[]).map((p) => `${base}/${p}`) };
+    const v = await atHome(data.id, data.fresh === true);
+    const list = data.quality === "data" ? v.data : v.saver;
+    const pages = list.map((_, i) => pageUrl(v, data.quality, i)).filter((u): u is string => Boolean(u));
+    return { pages };
   });

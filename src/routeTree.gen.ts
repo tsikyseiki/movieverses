@@ -48,6 +48,7 @@ import { Route as ScanIdRouteImport } from './routes/scan.$id'
 import { Route as ApiPublicRatingsRouteImport } from './routes/api.public.ratings'
 import { Route as ApiPublicReviewsRouteImport } from './routes/api.public.reviews'
 import { Route as ApiPublicStatusRouteImport } from './routes/api.public.status'
+import { Route as ApiPublicMangaPageRouteImport } from './routes/api.public.manga-page'
 import { Route as TitreKindIdRouteImport } from './routes/titre.$kind.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -244,6 +245,11 @@ const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
   path: '/api/public/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMangaPageRoute = ApiPublicMangaPageRouteImport.update({
+  id: '/api/public/manga-page',
+  path: '/api/public/manga-page',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TitreKindIdRoute = TitreKindIdRouteImport.update({
   id: '/titre/$kind/$id',
   path: '/titre/$kind/$id',
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/api/public/ratings': typeof ApiPublicRatingsRoute
   '/api/public/reviews': typeof ApiPublicReviewsRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/manga-page': typeof ApiPublicMangaPageRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesByTo {
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/api/public/ratings': typeof ApiPublicRatingsRoute
   '/api/public/reviews': typeof ApiPublicReviewsRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/manga-page': typeof ApiPublicMangaPageRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRoutesById {
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/api/public/ratings': typeof ApiPublicRatingsRoute
   '/api/public/reviews': typeof ApiPublicReviewsRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/manga-page': typeof ApiPublicMangaPageRoute
   '/titre/$kind/$id': typeof TitreKindIdRoute
 }
 export interface FileRouteTypes {
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/api/public/ratings'
     | '/api/public/reviews'
     | '/api/public/status'
+    | '/api/public/manga-page'
     | '/titre/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/api/public/ratings'
     | '/api/public/reviews'
     | '/api/public/status'
+    | '/api/public/manga-page'
     | '/titre/$kind/$id'
   id:
     | '__root__'
@@ -499,6 +510,7 @@ export interface FileRouteTypes {
     | '/api/public/ratings'
     | '/api/public/reviews'
     | '/api/public/status'
+    | '/api/public/manga-page'
     | '/titre/$kind/$id'
   fileRoutesById: FileRoutesById
 }
@@ -540,6 +552,7 @@ export interface RootRouteChildren {
   ApiPublicRatingsRoute: typeof ApiPublicRatingsRoute
   ApiPublicReviewsRoute: typeof ApiPublicReviewsRoute
   ApiPublicStatusRoute: typeof ApiPublicStatusRoute
+  ApiPublicMangaPageRoute: typeof ApiPublicMangaPageRoute
   TitreKindIdRoute: typeof TitreKindIdRoute
 }
 
@@ -818,6 +831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/manga-page': {
+      id: '/api/public/manga-page'
+      path: '/api/public/manga-page'
+      fullPath: '/api/public/manga-page'
+      preLoaderRoute: typeof ApiPublicMangaPageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/titre/$kind/$id': {
       id: '/titre/$kind/$id'
       path: '/titre/$kind/$id'
@@ -879,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicRatingsRoute: ApiPublicRatingsRoute,
   ApiPublicReviewsRoute: ApiPublicReviewsRoute,
   ApiPublicStatusRoute: ApiPublicStatusRoute,
+  ApiPublicMangaPageRoute: ApiPublicMangaPageRoute,
   TitreKindIdRoute: TitreKindIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 import { findMangaChapters, getChapterPages } from "@/lib/mangadex.functions";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,48 @@ export const Route = createFileRoute("/scan/$id")({
   component: ScanPage,
 });
 
+const HD_KEY = "mv-scan-hd";
+
+/** Une page : réserve sa place (pour que le chargement différé fonctionne), essaie le serveur MangaDex puis le serveur de secours. */
+function PageImg({ n, urls }: { n: number; urls: string[] }) {
+  const [k, setK] = useState(0);
+  const [state, setState] = useState<"loading" | "ok" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
+  const src = urls[k];
+  return (
+    <div className={cn("relative mx-auto w-full max-w-3xl overflow-hidden bg-muted", state !== "ok" && "min-h-[70vh]")}>
+      {state === "loading" && (
+        <div className="absolute inset-0 grid place-items-center text-center text-xs text-muted-foreground">
+          <div><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Page {n}</div>
+        </div>
+      )}
+      {state === "error" ? (
+        <div className="absolute inset-0 grid place-items-center p-4 text-center">
+          <div>
+            <p className="text-sm font-semibold">Page {n} indisponible</p>
+            <button
+              onClick={() => { setK(0); setAttempt((a) => a + 1); setState("loading"); }}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm transition hover:bg-accent"
+            ><RefreshCw className="h-4 w-4" /> Réessayer</button>
+          </div>
+        </div>
+      ) : src ? (
+        <img
+          key={`${k}-${attempt}`}
+          src={src}
+          alt={`Page ${n}`}
+          referrerPolicy="no-referrer"
+          decoding="async"
+          loading={n <= 3 ? "eager" : "lazy"}
+          onLoad={() => setState("ok")}
+          onError={() => { if (k + 1 < urls.length) setK(k + 1); else setState("error"); }}
+          className={cn("mx-auto block w-full", state !== "ok" && "opacity-0")}
+        />
+      ) : null}
+    </div>
+  );
+}
+
 function ScanPage() {
   const { id } = Route.useParams();
   const { t, c } = Route.useSearch();
@@ -28,18 +71,31 @@ function ScanPage() {
   const find = useServerFn(findMangaChapters);
   const pagesFn = useServerFn(getChapterPages);
   const titles = t.split("|").filter(Boolean);
+  const [hd, setHd] = useState(false);
+  useEffect(() => { try { setHd(localStorage.getItem(HD_KEY) === "1"); } catch { /* ignoré */ } }, []);
+  const quality = hd ? "data" : "saver";
+
   const list = useQuery({
     queryKey: ["md", id],
     queryFn: () => find({ data: { titles: titles.length ? titles : ["unknown"] } }),
     staleTime: 3600_000,
   });
-  const pages = useQuery({ queryKey: ["mdp", c], queryFn: () => pagesFn({ data: { id: c! } }), enabled: !!c, staleTime: 10 * 60_000, gcTime: 10 * 60_000 });
+  // Les adresses d'images ne sont valables que ~15 min : on les redemande au bout de 4 min
+  const pages = useQuery({
+    queryKey: ["mdp", c, quality],
+    queryFn: () => pagesFn({ data: { id: c!, quality } }),
+    enabled: !!c,
+    staleTime: 4 * 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
   const chapters = list.data?.chapters ?? [];
   const idx = chapters.findIndex((x) => x.id === c);
   const go = (cid?: string) => {
     navigate({ search: (p) => ({ ...p, c: cid }) });
     window.scrollTo({ top: 0 });
   };
+  const toggleHd = () => { const v = !hd; setHd(v); try { localStorage.setItem(HD_KEY, v ? "1" : "0"); } catch { /* ignoré */ } };
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-20 pt-36 lg:pt-28">
@@ -68,9 +124,23 @@ function ScanPage() {
       {c && (
         <div className="mt-6">
           <ChapterNav chapters={chapters} idx={idx} go={go} />
+          <div className="mt-3 flex items-center justify-end">
+            <button onClick={toggleHd} className="rounded-full border border-border px-3 py-1.5 text-xs transition hover:bg-accent" aria-pressed={hd}>
+              Qualité : {hd ? "HD (plus lourd)" : "économique"} · changer
+            </button>
+          </div>
           {pages.isLoading && <p className="py-20 text-center text-muted-foreground"><Loader2 className="mx-auto h-6 w-6 animate-spin" /></p>}
+          {pages.error && (
+            <div className="mt-6 rounded-xl border border-dashed border-border p-8 text-center">
+              <p className="text-sm text-muted-foreground">Impossible de récupérer les pages de ce chapitre.</p>
+              <button onClick={() => void pages.refetch()} className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm transition hover:bg-accent"><RefreshCw className="h-4 w-4" /> Réessayer</button>
+            </div>
+          )}
+          {pages.data && pages.data.pages.length === 0 && <p className="mt-6 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Ce chapitre ne contient aucune page lisible.</p>}
           <div className="mt-4 space-y-1">
-            {pages.data?.pages.map((p, i) => <img key={p} src={p} alt={`Page ${i + 1}`} loading={i < 3 ? "eager" : "lazy"} className="mx-auto w-full max-w-3xl bg-muted" />)}
+            {pages.data?.pages.map((p, i) => (
+              <PageImg key={`${c}-${quality}-${i}`} n={i + 1} urls={[p, `/api/public/manga-page?c=${c}&i=${i}&q=${quality}`]} />
+            ))}
           </div>
           <div className="mt-6"><ChapterNav chapters={chapters} idx={idx} go={go} /></div>
         </div>
