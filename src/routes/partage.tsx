@@ -104,9 +104,14 @@ function Shared() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["shared-lists"] });
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !me) return;
+    if (!name.trim()) return;
+    if (!me) { toast.error("Session non chargée : rechargez la page, puis réessayez."); return; }
     const { data, error } = await cloud.from("shared_watchlists").insert({ owner_id: me, name: name.trim().slice(0, 60) }).select("id").single();
-    if (error) { toast.error("Création impossible."); return; }
+    if (error) {
+      const e = error as { message?: string; code?: string; details?: string; hint?: string };
+      toast.error(`Création impossible : ${[e.code, e.message, e.details, e.hint].filter(Boolean).join(" · ").slice(0, 240) || "erreur inconnue"}`, { duration: 15000 });
+      return;
+    }
     setName(""); setSel(data.id); refresh();
   };
   const join = async (e: React.FormEvent) => {
