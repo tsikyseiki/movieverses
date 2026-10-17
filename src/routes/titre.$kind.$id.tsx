@@ -105,14 +105,19 @@ function DetailPage() {
     toast.success("Ajouté à votre journal de visionnage");
   };
   const prediction = mine ? null : predictRating(d.genres, ratings, ratingMeta, d.rating);
-  const playbackUrl = videoSource === "backup"
+  const tmdbId = d?.id;
+  const validTmdbId = tmdbId != null && String(tmdbId).trim() !== "";
+  const playbackUrl = validTmdbId
     ? (kind === "film"
-      ? `https://vidsrc.to/embed/movie/${encodeURIComponent(d.id)}`
-      : `https://vidsrc.to/embed/tv/${encodeURIComponent(d.id)}/${season}/${episode}`)
-    : (kind === "film"
-      ? `https://vidsrc.to/embed/movie?tmdb=${encodeURIComponent(d.id)}&lang=${encodeURIComponent(language)}`
-      : `https://vidsrc.to/embed/tv?tmdb=${encodeURIComponent(d.id)}&season=${season}&episode=${episode}&lang=${encodeURIComponent(language)}`);
-  const openPlaybackSource = () => window.open(playbackUrl, "_blank", "noopener,noreferrer");
+      ? `https://vidsrc.to/embed/movie/${encodeURIComponent(String(tmdbId))}`
+      : `https://vidsrc.to/embed/tv/${encodeURIComponent(String(tmdbId))}/${season}/${episode}`)
+    : "";
+  const selectedPlaybackUrl = videoSource === "backup" && validTmdbId
+    ? (kind === "film"
+      ? `https://vidsrc.to/embed/movie/${encodeURIComponent(String(tmdbId))}`
+      : `https://vidsrc.to/embed/tv/${encodeURIComponent(String(tmdbId))}/${season}/${episode}`)
+    : playbackUrl;
+  const openPlaybackSource = () => window.open(selectedPlaybackUrl, "_blank", "noopener,noreferrer");
 
   return (
     <div className="pb-16">
@@ -254,7 +259,7 @@ function DetailPage() {
               <iframe
                 key={`${kind}-${d.id}-${season}-${episode}-${language}-${videoSource}`}
                 className="absolute inset-0 h-full w-full border-0"
-                src={playbackUrl}
+                src={selectedPlaybackUrl}
                 title={`Lecteur vidéo — ${d.title}`}
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
