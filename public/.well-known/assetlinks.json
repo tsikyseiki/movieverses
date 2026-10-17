@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.movieverses.app",
+      "sha256_cert_fingerprints": ["B8:18:D9:1E:62:2F:55:5C:D8:2E:5B:6A:39:64:65:F7:C2:6E:12:A2:6D:AF:F1:0E:75:31:EC:63:BD:73:F8:80"]
+    }
+  }
+]
