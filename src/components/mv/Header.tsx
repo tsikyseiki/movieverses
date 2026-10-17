@@ -72,8 +72,9 @@ export function Header() {
     <header ref={ref} className={cn("fixed inset-x-0 top-0 z-40 transition-all duration-500", scrolled ? "bg-background/85 shadow-lg backdrop-blur-xl" : "bg-gradient-to-b from-scrim/80 to-transparent")}>
       <div className="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 md:px-8">
         <MainMenu />
-        <Link to="/" className="font-display text-xl font-extrabold tracking-tight">
-          Movie<span className="text-primary">Verse</span>
+        <Link to="/" aria-label="MovieVerse — accueil" className="flex items-center gap-2 shrink-0">
+          <img src="/movieverse-logo.png" alt="MovieVerse — Seïkī Dev" className="h-9 w-9 rounded-lg object-cover" />
+          <span className="font-display text-xl font-extrabold tracking-tight">Movie<span className="text-primary">Verse</span></span>
         </Link>
         {/* Accueil : aucune option en haut. Ailleurs : accès rapide aux catalogues et à Ma liste (tout le reste est dans le menu) */}
         {!isHome && (

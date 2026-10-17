@@ -59,9 +59,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "MovieVerse" },
       { property: "og:locale", content: "fr_FR" },
-      { property: "og:image", content: "https://movieverses.lovable.app/icon-512.png" },
+      { property: "og:image", content: "https://movieverses.lovable.app/movieverse-logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://movieverses.lovable.app/icon-512.png" },
+      { name: "twitter:image", content: "https://movieverses.lovable.app/movieverse-logo.png" },
       ...(SITE.googleSiteVerification ? [{ name: "google-site-verification", content: SITE.googleSiteVerification }] : []),
     ],
     scripts: SITE.adsenseClient
@@ -120,7 +120,8 @@ function GuestHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 bg-gradient-to-b from-scrim/80 to-transparent">
       <div className="mx-auto flex max-w-[1500px] items-center px-4 py-3 md:px-8">
-        <Link to="/auth" className="font-display text-xl font-extrabold tracking-tight">
+        <Link to="/auth" aria-label="MovieVerse — accueil" className="flex items-center gap-2 font-display text-xl font-extrabold tracking-tight">
+          <img src="/movieverse-logo.png" alt="" className="h-9 w-9 rounded-lg object-cover" />
           Movie<span className="text-primary">Verse</span>
         </Link>
       </div>

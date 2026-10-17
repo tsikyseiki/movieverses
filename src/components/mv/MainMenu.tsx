@@ -79,7 +79,7 @@ export function MainMenu() {
       </SheetTrigger>
       <SheetContent side="left" className="w-full overflow-y-auto p-0 sm:max-w-sm">
         <SheetHeader className="border-b border-border p-4">
-          <SheetTitle className="font-display text-2xl">Movie<span className="text-primary">Verse</span></SheetTitle>
+          <SheetTitle className="flex items-center gap-2 font-display text-2xl"><img src="/movieverse-logo.png" alt="" className="h-9 w-9 rounded-lg object-cover" />Movie<span className="text-primary">Verse</span></SheetTitle>
           {user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
         </SheetHeader>
         <div className="grid grid-cols-2 gap-2 p-4">
