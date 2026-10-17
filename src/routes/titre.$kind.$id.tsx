@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { BookOpen, Calendar, Check, Clock, Heart, Play, Scale, Share2, Star } from "lucide-react";
+import { BookOpen, Calendar, Check, Clock, Download, Heart, Play, Scale, Share2, Star } from "lucide-react";
 import { toast } from "sonner";
 import { CATEGORIES, fetchConnections, fetchDetail, type Kind } from "@/lib/catalog";
 import { useStore, itemKey } from "@/lib/store";
@@ -62,6 +62,10 @@ function DetailPage() {
     staleTime: 30 * 60_000,
   });
   const [playing, setPlaying] = useState(false);
+  const [season, setSeason] = useState(() => Math.max(1, Number(new URLSearchParams(window.location.search).get("season")) || 1));
+  const [episode, setEpisode] = useState(() => Math.max(1, Number(new URLSearchParams(window.location.search).get("episode")) || 1));
+  const [language, setLanguage] = useState(() => new URLSearchParams(window.location.search).get("language") || "fr");
+  const [videoSource, setVideoSource] = useState<"primary" | "backup">("primary");
   useEffect(() => {
     setPlaying(false);
     window.scrollTo({ top: 0 });
@@ -101,6 +105,14 @@ function DetailPage() {
     toast.success("Ajouté à votre journal de visionnage");
   };
   const prediction = mine ? null : predictRating(d.genres, ratings, ratingMeta, d.rating);
+  const playbackUrl = videoSource === "backup"
+    ? (kind === "film"
+      ? `https://vidsrc.to/embed/movie/${encodeURIComponent(d.id)}`
+      : `https://vidsrc.to/embed/tv/${encodeURIComponent(d.id)}/${season}/${episode}`)
+    : (kind === "film"
+      ? `https://vidsrc.xyz/embed/movie?tmdb=${encodeURIComponent(d.id)}&lang=${encodeURIComponent(language)}`
+      : `https://vidsrc.xyz/embed/tv?tmdb=${encodeURIComponent(d.id)}&season=${season}&episode=${episode}&lang=${encodeURIComponent(language)}`);
+  const openPlaybackSource = () => window.open(playbackUrl, "_blank", "noopener,noreferrer");
 
   return (
     <div className="pb-16">
@@ -182,6 +194,76 @@ function DetailPage() {
       </section>
 
       <div className="mx-auto max-w-[1500px] space-y-14 px-4 md:px-8">
+        {kind !== "manga" && (
+          <section id="lecteur-video" className="space-y-4">
+            <h2 className="text-2xl font-bold">Lecteur vidéo</h2>
+            <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
+              <div className="min-w-44 flex-1">
+                <label htmlFor="mv-language" className="mb-2 block text-sm font-medium">Langue</label>
+                <select id="mv-language" value={language} onChange={(e) => {
+                  const next = e.target.value;
+                  setLanguage(next);
+                  const params = new URLSearchParams(window.location.search);
+                  params.set("language", next);
+                  window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}${window.location.hash}`);
+                }} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
+                  <option value="fr">VF — Français</option>
+                  <option value="vostfr">VOSTFR — Audio original, sous-titres français</option>
+                  <option value="en">VO — Anglais</option>
+                  <option value="original">VO — Langue originale</option>
+                </select>
+              </div>
+              {kind !== "film" && (
+                <>
+                  <div>
+                    <label htmlFor="mv-season" className="mb-2 block text-sm font-medium">Saison</label>
+                    <select id="mv-season" value={season} onChange={(e) => {
+                      const next = Number(e.target.value); setSeason(next);
+                      const params = new URLSearchParams(window.location.search); params.set("season", String(next)); params.set("episode", String(episode));
+                      window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}${window.location.hash}`);
+                    }} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+                      {Array.from({ length: 20 }, (_, i) => <option key={i + 1} value={i + 1}>Saison {i + 1}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="mv-episode" className="mb-2 block text-sm font-medium">Épisode</label>
+                    <select id="mv-episode" value={episode} onChange={(e) => {
+                      const next = Number(e.target.value); setEpisode(next);
+                      const params = new URLSearchParams(window.location.search); params.set("season", String(season)); params.set("episode", String(next));
+                      window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}${window.location.hash}`);
+                    }} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+                      {Array.from({ length: 100 }, (_, i) => <option key={i + 1} value={i + 1}>Épisode {i + 1}</option>)}
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-medium">Source vidéo :</span>
+              <button type="button" onClick={() => setVideoSource("primary")} aria-pressed={videoSource === "primary"} className={`rounded-lg border px-3 py-2 text-sm ${videoSource === "primary" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>Source principale</button>
+              <button type="button" onClick={() => setVideoSource("backup")} aria-pressed={videoSource === "backup"} className={`rounded-lg border px-3 py-2 text-sm ${videoSource === "backup" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>Source de secours</button>
+            </div>
+            <p className="text-sm text-muted-foreground">Si la source principale ne fonctionne pas, essaie la source de secours. La disponibilité des langues dépend du lecteur choisi.</p>
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+              <button type="button" onClick={openPlaybackSource} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-semibold text-primary-foreground hover:opacity-90">
+                <Download className="h-4 w-4" /> Ouvrir la source / téléchargement
+              </button>
+              <p className="max-w-2xl text-xs text-muted-foreground">Ouvre la source sélectionnée dans un nouvel onglet. Si le fournisseur autorise le téléchargement, utilise les commandes du navigateur ou du lecteur. MovieVerse ne peut pas afficher la progression d’un téléchargement géré par un site externe.</p>
+            </div>
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted ring-1 ring-border">
+              <iframe
+                key={`${kind}-${d.id}-${season}-${episode}-${language}-${videoSource}`}
+                className="absolute inset-0 h-full w-full border-0"
+                src={playbackUrl}
+                title={`Lecteur vidéo — ${d.title}`}
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
         {d.trailer && (
           <section id="trailer">
             <h2 className="mb-4 text-2xl font-bold">Bande-annonce</h2>
