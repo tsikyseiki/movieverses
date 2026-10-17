@@ -260,6 +260,7 @@ function DetailPage() {
                 key={`${kind}-${d.id}-${season}-${episode}-${language}-${videoSource}`}
                 className="absolute inset-0 h-full w-full border-0"
                 src={selectedPlaybackUrl}
+                sandbox="allow-scripts allow-same-origin allow-forms"
                 title={`Lecteur vidéo — ${d.title}`}
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
