@@ -110,8 +110,8 @@ function DetailPage() {
       ? `https://vidsrc.to/embed/movie/${encodeURIComponent(d.id)}`
       : `https://vidsrc.to/embed/tv/${encodeURIComponent(d.id)}/${season}/${episode}`)
     : (kind === "film"
-      ? `https://vidsrc.xyz/embed/movie?tmdb=${encodeURIComponent(d.id)}&lang=${encodeURIComponent(language)}`
-      : `https://vidsrc.xyz/embed/tv?tmdb=${encodeURIComponent(d.id)}&season=${season}&episode=${episode}&lang=${encodeURIComponent(language)}`);
+      ? `https://vidsrc.to/embed/movie?tmdb=${encodeURIComponent(d.id)}&lang=${encodeURIComponent(language)}`
+      : `https://vidsrc.to/embed/tv?tmdb=${encodeURIComponent(d.id)}&season=${season}&episode=${episode}&lang=${encodeURIComponent(language)}`);
   const openPlaybackSource = () => window.open(playbackUrl, "_blank", "noopener,noreferrer");
 
   return (
